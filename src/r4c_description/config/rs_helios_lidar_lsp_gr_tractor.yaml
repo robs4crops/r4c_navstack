@@ -1,0 +1,77 @@
+# https://www.robosense.ai/en/rslidar/RS-Helios
+name: rslidar_helios_16
+size:
+  x: 0.1000
+  y: 0.1000
+  z: 0.1005
+mass: 0.990
+color:
+  r: 1.0
+  g: 1.0
+  b: 1.0
+  a: 1.0
+parent_frame: base_link
+base_frame: rslidar_base_link
+body_frame: rslidar_body_link
+data_frame: rslidar_link
+joint_parent_frame_base_frame:
+  name: rslidar_base_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 1.56
+  y: 0.0
+  z: 0.16
+joint_base_frame_body_frame:
+  name: rslidar_body_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.05025
+joint_body_frame_data_frame:
+  name: rslidar_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.01325
+mesh:
+  package: r4c_description
+  relative_path: meshes/rs_helios_lidar.stl
+plugin:
+  enabled: 0
+  visualize: false
+  update_rate: 20.0
+  topic: rslidar_points
+# samples = (max_angle - min_angle)/resolution + 1
+#         = (180 - -180)/resolution + 1
+#         = 360/resolution + 1
+# resolutions = 0.1 deg, 0.2 deg, 0.4 deg
+# Example: 360/0.2 + 1 = 1801
+  horizontal_scanning:
+    min_angle: -3.141592654
+    max_angle: 3.141592654
+    samples: 1801
+# 15 deg = 0.261799388 rad
+# samples (or rings) = (max_angle - min_angle)/resolution + 1
+#                    = (15.0 - -15.0)/resolution + 1
+#                    = 30.0/resolution + 1
+# resolution of 2 deg (for example)
+# samples = 30.0/2.0 + 1 = 16
+  vertical_scanning:
+    min_angle: -0.261799388
+    max_angle: 0.261799388
+    samples: 16
+  range:
+    min: 0.2
+    max: 50.0
+    resolution: 0.01
+  noise:
+    type: gaussian
+    mean: 0.0
+    stddev: 0.01
+  organize_cloud: false
+  min_intensity: 0.00000000001

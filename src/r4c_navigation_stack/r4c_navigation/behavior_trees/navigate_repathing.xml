@@ -1,0 +1,17 @@
+<!--
+  This Behavior Tree navigates to a pose
+-->
+
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <Sequence>
+      <!--<ComputePathToPose goal="{goal}" path="{dummy_path}" planner_id="GridBased"/>-->
+      <PipelineSequence name="NavigateToPose">
+        <RateController hz="2.0">
+          <GetPathService request_timeout="30.0" service="/eut_crop_row_estimator/get_path" path="{path}" path_updated="{path_updated}"/>
+        </RateController>
+        <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+      </PipelineSequence>
+    </Sequence>
+  </BehaviorTree>
+</root>

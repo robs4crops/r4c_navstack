@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="r4c_commander_params_file" default="$(find-pkg-share r4c_commander)/config/r4c_commander_config.yaml"/>
+
+  <node pkg="r4c_commander" exec="r4c_commander_node" name="r4c_commander" output="screen" respawn="True">
+    <param from="$(var r4c_commander_params_file)"/>
+  </node>
+
+  <node pkg="r4c_commander" exec="fc_diagnostic_publisher.py" name="fc_diagnostic_publisher" output="screen" respawn="True">
+    <param from="$(var r4c_commander_params_file)"/>
+  </node>
+
+ </launch>

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="rtk"                    default="true"/> <!-- If we want to received rtk ntrip corrections -->
+  <arg name="vrs"                    default="true"/> <!-- If using rtk with a Virtal Reference Station -->
+  
+  <!-- Ntrip arguments -->
+  <arg name="host"                   default="84.88.72.26" />
+  <arg name="port"                   default="2101" />
+  <arg name="mountpoint"             default="VRS3_GAL" />
+  <arg name="authenticate"           default="true" />
+  <arg name="username"               default="Eurecat_Robotica_r4c" />
+  <arg name="password"               default="eurecat_r4c" />
+  <arg name="debug"                  default="false" />
+  <arg name="rtcm_message_package"   default="rtcm_msgs" />
+
+  <group if="$(var rtk)">
+    <node name="ntrip_client_node" pkg="ntrip_client" exec="ntrip_ros.py" output="screen" respawn="true" respawn_delay="10">
+      <env name="NTRIP_CLIENT_DEBUG"               value="$(var debug)" />
+      <param name="host"                           value="$(var host)"/>
+      <param name="port"                           value="$(var port)"/>
+      <param name="mountpoint"                     value="$(var mountpoint)"/>
+      <param name="authenticate"                   value="$(var authenticate)"/>
+      <param name="username"                       value="$(var username)"/>
+      <param name="password"                       value="$(var password)"/>
+      <param name="rtcm_message_package"           value="$(var rtcm_message_package)"/>
+      <param name="reconnect_attempt_max"          value="10"/>
+      <param name="reconnect_attempt_wait_seconds" value="5"/>
+    </node>
+
+    <node if="$(var vrs)" name="send_nmea" exec="send_nmea.py" pkg="ntrip_client" output="screen">
+      <param name="frequency" value="1.0"/>
+      <param name="latitude" value="42.1617155"/>
+      <param name="longitude" value="3.0929984"/>
+    </node>
+  </group>
+
+  <!-- Moving base ublox driver -->
+ <arg name="mbase_config" default="$(find-pkg-share r4c_bringup)/config/zed_mbase.yaml"/>
+ <node namespace="mbase" pkg="ublox_gps" exec="ublox_gps_node" name="mbase" output="screen" respawn="true" respawn_delay="5">
+    <param from="$(var mbase_config)"/>
+ </node>
+
+ <!-- Rover ublox driver -->
+ <arg name="rover_config" default="$(find-pkg-share r4c_bringup)/config/zed_rover.yaml"/>
+ <node namespace="rover" pkg="ublox_gps" exec="ublox_gps_node" name="rover" output="screen" respawn="true" respawn_delay="5">
+    <param from="$(var rover_config)"/>
+ <remap from="/rtcm" to="/rtcm_ignore"/>
+
+</launch>
+
+

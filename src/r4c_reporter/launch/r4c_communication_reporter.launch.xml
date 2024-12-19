@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="use_can"       default="false"/>
+
+  <arg name="r4c_reporter_params_file" default="$(find-pkg-share r4c_reporter)/config/r4c_reporter_config.yaml"/>
+
+  <node pkg="r4c_reporter" exec="communication_reporter_node" name="communication_reporter" output="screen">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="internet_reporter_node" name="internet_reporter" output="screen">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="can_reporter_node" name="can_reporter" output="screen" if="$(var use_can)">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+</launch>

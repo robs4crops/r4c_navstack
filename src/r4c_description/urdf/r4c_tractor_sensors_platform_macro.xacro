@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="r4c_tractor_sensors_platform" params="config_file">
+
+    <xacro:property name="conf_file" value="${config_file}"/>
+    <xacro:property name="config"    value="${xacro.load_yaml(conf_file)}"/>
+
+    <link name="${config['base_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_parent_frame_base_frame']['name']}" type="fixed">
+      <parent link="${config['parent_frame']}"/>
+      <child link="${config['base_frame']}"/>
+      <origin rpy="${config['joint_parent_frame_base_frame']['R']}
+      ${config['joint_parent_frame_base_frame']['P']}
+      ${config['joint_parent_frame_base_frame']['Y']}"
+      xyz="${config['joint_parent_frame_base_frame']['x']}
+      ${config['joint_parent_frame_base_frame']['y']}
+      ${config['joint_parent_frame_base_frame']['z']}"/>
+    </joint>
+
+  </xacro:macro>
+
+</robot>

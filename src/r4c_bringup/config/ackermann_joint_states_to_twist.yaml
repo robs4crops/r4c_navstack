@@ -1,0 +1,13 @@
+ackermann_joint_states_to_twist:
+  ros__parameters:
+    rear_left_joint: rear_left_joint
+    rear_right_joint: rear_right_joint
+    left_steering_joint: left_steering_joint
+    right_steering_joint: right_steering_joint
+    front_wheel_radius: 0.425
+    rear_wheel_radius: 0.65
+    wheelbase: 2.1804
+    front_wheel_spacing: 1.176
+    rear_wheel_spacing: 1.176
+    joint_states_topic: joint_states
+    twist_topic: r4c_tractor/vel

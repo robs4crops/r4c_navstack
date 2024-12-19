@@ -1,0 +1,20 @@
+<launch>
+
+  <arg name="large_scale_pilot"    default="es"/>
+  <arg name="input_camera_topic"   default="/camera/image"/>
+
+  <arg name="output_camera_topic"    default="/lsps/camera1/image/compressed"   if="$(eval '\'$(var large_scale_pilot)\' == \'es\'')"/>
+  <arg name="output_camera_topic"    default="/lspg/camera1/image/compressed"   if="$(eval '\'$(var large_scale_pilot)\' == \'gr\'')"/>
+  <arg name="output_camera_topic"    default="/lspsim/camera1/image/compressed" if="$(eval '\'$(var large_scale_pilot)\' == \'sim\'')"/>
+
+  <node pkg="r4c_bringup" exec="compress_image.py" name="compress_image" output="screen">
+    <remap from="input_image"        to="$(var input_camera_topic)"/>
+    <remap from="output_image"       to="$(var output_camera_topic)"/>
+  </node>
+
+  <node pkg="web_video_server" exec="web_video_server">
+    <param name='address' value="'0.0.0.0'"/>
+    <param name='port'    value="8092"/>
+  </node>
+
+</launch>

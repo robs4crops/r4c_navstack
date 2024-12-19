@@ -1,0 +1,460 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="greek_row">
+    <static>true</static>
+
+    <include>
+      <name>POLE_A0</name>
+      <pose> 0 0 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A1</name>
+      <pose> -0.512 -0.501 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A2</name>
+      <pose> -1.025 -1.002 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A3</name>
+      <pose> -1.537 -1.503 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A4</name>
+      <pose> -2.05 -2.004 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A5</name>
+      <pose> -2.562 -2.505 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A6</name>
+      <pose> -3.074 -3.006 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A7</name>
+      <pose> -3.587 -3.507 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A8</name>
+      <pose> -4.099 -4.008 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A9</name>
+      <pose> -4.611 -4.509 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A10</name>
+      <pose> -5.124 -5.01 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A11</name>
+      <pose> -5.636 -5.511 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A12</name>
+      <pose> -6.148 -6.012 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A13</name>
+      <pose> -6.661 -6.513 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A14</name>
+      <pose> -7.173 -7.014 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A15</name>
+      <pose> -7.685 -7.515 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A16</name>
+      <pose> -8.198 -8.016 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A17</name>
+      <pose> -8.71 -8.517 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A18</name>
+      <pose> -9.222 -9.018 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A19</name>
+      <pose> -9.735 -9.519 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A20</name>
+      <pose> -10.247 -10.02 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A21</name>
+      <pose> -10.759 -10.521 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A22</name>
+      <pose> -11.272 -11.022 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A23</name>
+      <pose> -11.784 -11.523 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A24</name>
+      <pose> -12.296 -12.024 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A25</name>
+      <pose> -12.809 -12.525 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A26</name>
+      <pose> -13.321 -13.026 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A27</name>
+      <pose> -13.833 -13.527 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A28</name>
+      <pose> -14.346 -14.028 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_A29</name>
+      <pose> -14.858 -14.529 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+
+    <include>
+      <name>POLE_B0</name>
+      <pose> -15.37 -15.03 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B1</name>
+      <pose> -15.883 -15.531 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B2</name>
+      <pose> -16.395 -16.032 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B3</name>
+      <pose> -16.907 -16.533 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B4</name>
+      <pose> -17.42 -17.034 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B5</name>
+      <pose> -17.932 -17.535 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B6</name>
+      <pose> -18.444 -18.036 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B7</name>
+      <pose> -18.957 -18.537 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B8</name>
+      <pose> -19.469 -19.038 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B9</name>
+      <pose> -19.981 -19.539 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B10</name>
+      <pose> -20.494 -20.04 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B11</name>
+      <pose> -21.006 -20.541 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B12</name>
+      <pose> -21.518 -21.042 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B13</name>
+      <pose> -22.031 -21.543 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B14</name>
+      <pose> -22.543 -22.044 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B15</name>
+      <pose> -23.055 -22.545 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B16</name>
+      <pose> -23.568 -23.046 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B17</name>
+      <pose> -24.08 -23.547 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B18</name>
+      <pose> -24.592 -24.048 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B19</name>
+      <pose> -25.105 -24.549 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B20</name>
+      <pose> -25.617 -25.05 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B21</name>
+      <pose> -26.129 -25.551 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B22</name>
+      <pose> -26.642 -26.052 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B23</name>
+      <pose> -27.154 -26.553 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B24</name>
+      <pose> -27.666 -27.054 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B25</name>
+      <pose> -28.179 -27.555 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B26</name>
+      <pose> -28.691 -28.056 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B27</name>
+      <pose> -29.203 -28.557 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B28</name>
+      <pose> -29.716 -29.058 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_B29</name>
+      <pose> -30.228 -29.559 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+
+    <include>
+      <name>POLE_C0</name>
+      <pose> -30.74 -30.06 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C1</name>
+      <pose> -31.253 -30.561 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C2</name>
+      <pose> -31.765 -31.062 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C3</name>
+      <pose> -32.277 -31.563 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C4</name>
+      <pose> -32.79 -32.064 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C5</name>
+      <pose> -33.302 -32.565 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C6</name>
+      <pose> -33.814 -33.066 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C7</name>
+      <pose> -34.327 -33.567 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C8</name>
+      <pose> -34.839 -34.068 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C9</name>
+      <pose> -35.351 -34.569 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C10</name>
+      <pose> -35.864 -35.07 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C11</name>
+      <pose> -36.376 -35.571 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C12</name>
+      <pose> -36.888 -36.072 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C13</name>
+      <pose> -37.401 -36.573 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C14</name>
+      <pose> -37.913 -37.074 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C15</name>
+      <pose> -38.425 -37.575 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C16</name>
+      <pose> -38.938 -38.076 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C17</name>
+      <pose> -39.45 -38.577 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C18</name>
+      <pose> -39.962 -39.078 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C19</name>
+      <pose> -40.475 -39.579 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C20</name>
+      <pose> -40.987 -40.08 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C21</name>
+      <pose> -41.499 -40.581 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C22</name>
+      <pose> -42.012 -41.082 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C23</name>
+      <pose> -42.524 -41.583 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C24</name>
+      <pose> -43.036 -42.084 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C25</name>
+      <pose> -43.549 -42.585 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C26</name>
+      <pose> -44.061 -43.086 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C27</name>
+      <pose> -44.573 -43.587 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <include>
+      <name>POLE_C28</name>
+      <pose> -45.086 -44.088 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include>
+    <!-- <include>
+      <name>POLE_C29</name>
+      <pose> -45.703 -44.305 1 0 0 0 </pose>
+      <uri>model://pole</uri>
+    </include> -->
+
+  </model>
+</sdf>

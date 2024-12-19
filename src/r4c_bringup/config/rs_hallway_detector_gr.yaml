@@ -1,0 +1,45 @@
+hallway_detector:
+  ros__parameters:
+    # Frames
+    target_frame: base_footprint
+
+     # Output line length
+    wall_line_length: 15.0
+
+    # Pointcloud filtering
+    pcl_min_x: 3.0
+    pcl_max_x: 11.0
+    pcl_min_y: -3.5
+    pcl_max_y: 3.5
+    pcl_min_z: 0.1
+    pcl_max_z: 3.0
+
+    # Voxel sizes
+    voxel_size_3d: 0.01
+    voxel_size_2d: 0.05
+
+    # Euclidean Clustering
+    cluster_min_size: 70
+    cluster_max_size: 1000
+    cluster_tolerance: 0.5
+
+    # Ground parameters
+    ground_dir_x: 0.0
+    ground_dir_y: 0.0
+    ground_dir_z: 1.0
+    ground_min_x: 0.0
+    ground_max_x: 20.0
+    ground_min_y: -5.0
+    ground_max_y: 5.0
+    ground_min_z: -1.5
+    ground_max_z: 0.5
+    ground_ransac_max_iter: 1000
+    ground_ransac_dist_thresh: 0.4
+    ground_voxel_size: 0.01
+    ground_min_size: 100
+    ground_thresh: 20.0
+    ground_max_iters: 10
+    max_dist_to_ground: 0.6
+
+    # Debugging options
+    debug: True

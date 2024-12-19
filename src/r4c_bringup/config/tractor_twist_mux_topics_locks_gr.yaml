@@ -1,0 +1,49 @@
+twist_mux:
+  ros__parameters:
+    topics:
+      gamepad_teleop:
+        topic:       "r4c_tractor/teleop_vel"
+        timeout:     0.10
+        priority:    13
+        short_desc:  "Velocity commands sent by a gamepad used for teleoperation"
+      fc_teleop:
+        topic:       "/lspg/cmd_vel"
+        timeout:     0.15
+        priority:    12
+        short_desc:  "Teleoperation by FC"
+      mw_soft_stop:
+        topic:       "r4c_tractor/mw/soft_stop"
+        timeout:     0.15
+        priority:    11
+        short_desc:  "Safe stop send by middleware"
+      zero_nav_cmd_vel:
+        topic:       "/r4c_tractor/zero_nav_cmd_vel"
+        timeout:     0.15
+        priority:    10
+        short_desc:  "Zero velocity sent by commander for start/pause/stop mission services"
+      navigation_stack:
+        topic:       "r4c_tractor/nav_vel"
+        timeout:     0.5
+        priority:    9
+        short_desc:  "Velocity commands sent by nav2 stack"
+      rqt:
+        topic:       "r4c_tractor/rqt_vel"
+        timeout:     0.5
+        priority:    8
+        short_desc:  "Velocity commands sent by rqt robot steering"
+      cli:
+        topic:       "r4c_tractor/cli_vel"
+        timeout:     0.5
+        priority:    7
+        short_desc:  "Velocity commands sent by the command line during testing"
+      cli_stop:
+        topic:       "r4c_tractor/cli_stop_vel"
+        timeout:     0.5
+        priority:    6
+        short_desc:  "Velocity commands sent by the command line to maintain the tractor stopped during testing"
+    locks:
+      pause_twists:
+        topic:       "r4c_tractor/manual_mode"
+        timeout:     0.0
+        priority:    100
+        short_desc:  "Pause the publication of all twist messages"

@@ -1,0 +1,212 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- The macro can't be called imu, since one tag in the gazebo element is called imu also and
+  xacro fails to parse the macro if these two names are the same -->
+  <xacro:macro name="ublox" params="config_file">
+
+    <xacro:property name="conf_file" value="${config_file}"/>
+    <xacro:property name="config"    value="${xacro.load_yaml(conf_file)}"/>
+
+    <xacro:property name="mbase_name"       value="${config['mbase']['name']}"/>
+    <xacro:property name="mbase_size_x"     value="${config['mbase']['size']['x']}"/>
+    <xacro:property name="mbase_size_y"     value="${config['mbase']['size']['y']}"/>
+    <xacro:property name="mbase_size_z"     value="${config['mbase']['size']['z']}"/>
+    <xacro:property name="mbase_mass"       value="${config['mbase']['mass']}"/>
+    <xacro:property name="rover_name"       value="${config['rover']['name']}"/>
+    <xacro:property name="rover_size_x"     value="${config['rover']['size']['x']}"/>
+    <xacro:property name="rover_size_y"     value="${config['rover']['size']['y']}"/>
+    <xacro:property name="rover_size_z"     value="${config['rover']['size']['z']}"/>
+    <xacro:property name="rover_mass"       value="${config['rover']['mass']}"/>
+
+    <!--  MBASE -->
+    <link name="${config['mbase']['base_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['mbase']['joint_parent_frame_base_frame']['name']}" type="fixed">
+      <parent link="${config['mbase']['parent_frame']}"/>
+      <child link="${config['mbase']['base_frame']}"/>
+      <origin rpy="${config['mbase']['joint_parent_frame_base_frame']['R']}
+      ${config['mbase']['joint_parent_frame_base_frame']['P']}
+      ${config['mbase']['joint_parent_frame_base_frame']['Y']}"
+      xyz="${config['mbase']['joint_parent_frame_base_frame']['x']}
+      ${config['mbase']['joint_parent_frame_base_frame']['y']}
+      ${config['mbase']['joint_parent_frame_base_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['mbase']['body_frame']}">
+      <visual>
+        <geometry>
+          <box size="${mbase_size_x} ${mbase_size_y} ${mbase_size_z}"/>
+        </geometry>
+        <material name="${config['mbase']['body_frame']}_color">
+            <color rgba="${config['mbase']['color']['r']} ${config['mbase']['color']['g']} ${config['mbase']['color']['b']} ${config['mbase']['color']['a']}"/>
+        </material>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${mbase_size_x} ${mbase_size_y} ${mbase_size_z}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </collision>
+      <inertial>
+        <mass value="${mbase_mass}"/>
+        <inertia ixx="${(1.0/12.0) * mbase_mass * (mbase_size_y * mbase_size_y + mbase_size_z * mbase_size_z)}"  ixy="0.0" ixz="0.0"
+                 iyy="${(1.0/12.0) * mbase_mass * (mbase_size_x * mbase_size_x + mbase_size_z * mbase_size_z)}" iyz="0.0"
+                 izz="${(1.0/12.0) * mbase_mass * (mbase_size_x * mbase_size_x + mbase_size_y * mbase_size_y)}" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['mbase']['joint_base_frame_body_frame']['name']}" type="fixed">
+      <parent link="${config['mbase']['base_frame']}"/>
+      <child link="${config['mbase']['body_frame']}"/>
+      <origin rpy="${config['mbase']['joint_base_frame_body_frame']['R']}
+      ${config['mbase']['joint_base_frame_body_frame']['P']}
+      ${config['mbase']['joint_base_frame_body_frame']['Y']}"
+      xyz="${config['mbase']['joint_base_frame_body_frame']['x']}
+      ${config['mbase']['joint_base_frame_body_frame']['y']}
+      ${config['mbase']['joint_base_frame_body_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['mbase']['data_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['mbase']['joint_body_frame_data_frame']['name']}" type="fixed">
+      <parent link="${config['mbase']['body_frame']}"/>
+      <child link="${config['mbase']['data_frame']}"/>
+      <origin rpy="${config['mbase']['joint_body_frame_data_frame']['R']}
+      ${config['mbase']['joint_body_frame_data_frame']['P']}
+      ${config['mbase']['joint_body_frame_data_frame']['Y']}"
+      xyz="${config['mbase']['joint_body_frame_data_frame']['x']}
+      ${config['mbase']['joint_body_frame_data_frame']['y']}
+      ${config['mbase']['joint_body_frame_data_frame']['z']}"/>
+    </joint>
+
+    <!--  ROVER -->
+
+    <link name="${config['rover']['base_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['rover']['joint_parent_frame_base_frame']['name']}" type="fixed">
+      <parent link="${config['rover']['parent_frame']}"/>
+      <child link="${config['rover']['base_frame']}"/>
+      <origin rpy="${config['rover']['joint_parent_frame_base_frame']['R']}
+      ${config['rover']['joint_parent_frame_base_frame']['P']}
+      ${config['rover']['joint_parent_frame_base_frame']['Y']}"
+      xyz="${config['rover']['joint_parent_frame_base_frame']['x']}
+      ${config['rover']['joint_parent_frame_base_frame']['y']}
+      ${config['rover']['joint_parent_frame_base_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['rover']['body_frame']}">
+      <visual>
+        <geometry>
+          <box size="${rover_size_x} ${rover_size_y} ${rover_size_z}"/>
+        </geometry>
+        <material name="${config['rover']['body_frame']}_color">
+            <color rgba="${config['rover']['color']['r']} ${config['rover']['color']['g']} ${config['rover']['color']['b']} ${config['rover']['color']['a']}"/>
+        </material>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${rover_size_x} ${rover_size_y} ${rover_size_z}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </collision>
+      <inertial>
+        <mass value="${rover_mass}"/>
+        <inertia ixx="${(1.0/12.0) * rover_mass * (rover_size_y * rover_size_y + rover_size_z * rover_size_z)}"  ixy="0.0" ixz="0.0"
+                iyy="${(1.0/12.0) * rover_mass * (rover_size_x * rover_size_x + rover_size_z * rover_size_z)}" iyz="0.0"
+                izz="${(1.0/12.0) * rover_mass * (rover_size_x * rover_size_x + rover_size_y * rover_size_y)}" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['rover']['joint_base_frame_body_frame']['name']}" type="fixed">
+      <parent link="${config['rover']['base_frame']}"/>
+      <child link="${config['rover']['body_frame']}"/>
+      <origin rpy="${config['rover']['joint_base_frame_body_frame']['R']}
+      ${config['rover']['joint_base_frame_body_frame']['P']}
+      ${config['rover']['joint_base_frame_body_frame']['Y']}"
+      xyz="${config['rover']['joint_base_frame_body_frame']['x']}
+      ${config['rover']['joint_base_frame_body_frame']['y']}
+      ${config['rover']['joint_base_frame_body_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['rover']['data_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['rover']['joint_body_frame_data_frame']['name']}" type="fixed">
+      <parent link="${config['rover']['body_frame']}"/>
+      <child link="${config['rover']['data_frame']}"/>
+      <origin rpy="${config['rover']['joint_body_frame_data_frame']['R']}
+      ${config['rover']['joint_body_frame_data_frame']['P']}
+      ${config['rover']['joint_body_frame_data_frame']['Y']}"
+      xyz="${config['rover']['joint_body_frame_data_frame']['x']}
+      ${config['rover']['joint_body_frame_data_frame']['y']}
+      ${config['rover']['joint_body_frame_data_frame']['z']}"/>
+    </joint>
+
+    <gazebo reference="${config['plugins']['gps']['frame']}">
+      <sensor type="gps" name="gps_gzb_sensor">
+        <always_on>true</always_on>
+        <update_rate>${config['plugins']['gps']['update_rate']}</update_rate>
+        <visualize>${config['plugins']['gps']['visualize']}</visualize>
+        <plugin name="ublox_gzb_ros_ray_sensor_plugin" filename="libgazebo_ros_gps_sensor.so">
+          <ros>
+            <remapping>~/out:=${config['plugins']['gps']['topic']}</remapping>
+          </ros>
+          <frame_name>${config['plugins']['gps']['frame']}</frame_name>
+          <offset>0 0 0</offset>
+          <drift>0.000 0.000 0.000</drift>
+          <gaussianNoise>0.0005 0.0005 0.0005</gaussianNoise>
+          <velocityDrift>0.000001 0.000001 0.000001</velocityDrift>
+          <velocityGaussianNoise>0.00005 0.00005 0.00005</velocityGaussianNoise>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="${config['plugins']['heading']['frame']}">
+      <sensor type="imu" name="heading_gzb_sensor">
+          <always_on>true</always_on>
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <update_rate>${config['plugins']['heading']['update_rate']}</update_rate>
+          <visualize>${config['plugins']['heading']['visualize']}</visualize>
+          <plugin filename="libgazebo_ros_imu_sensor.so" name="ublox_gzb_ros_imu_sensor_plugin">
+            <ros>
+              <!-- <namespace>${config['plugins']['ns']}</namespace> -->
+              <remapping>~/out:=${config['plugins']['heading']['topic']}</remapping>
+            </ros>
+            <initial_orientation_as_reference>${config['plugins']['heading']['initial_orientation_as_reference']}</initial_orientation_as_reference>
+          </plugin>
+        </sensor>
+
+    </gazebo>
+
+
+  </xacro:macro>
+
+</robot>

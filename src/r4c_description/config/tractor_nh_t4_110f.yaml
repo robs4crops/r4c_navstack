@@ -1,0 +1,111 @@
+name: tractor_nh_t4_110f
+size:
+  x: 3.9360
+  y: 1.25
+  z: 1.97
+mass: 1000.0
+color:
+  r: 0.0
+  g: 0.0
+  b: 0.7
+  a: 0.7
+front_wheel_mass: 50.0
+front_wheel_radius: 0.465
+front_wheel_width: 0.30
+front_wheel_spacing: 1.176
+# rear_wheel_mass = (front_wheel_mass/volume_fron_wheel) * volume_rear_wheel
+rear_wheel_mass: 136.779
+rear_wheel_radius: 0.56
+rear_wheel_width: 0.42
+rear_wheel_spacing: 1.176
+wheelbase: 2.1804
+wheelbase_height: -0.2
+# 36 deg => 0.628318531 rad
+max_steering_angle:   0.628318531
+footprint_frame: base_footprint
+base_frame: base_link
+body_frame: body_link
+left_steering_frame: left_steering_link
+right_steering_frame: right_steering_link
+front_left_wheel_frame: front_left_wheel_link
+front_right_wheel_frame: front_right_wheel_link
+rear_left_wheel_frame: rear_left_wheel_link
+rear_right_wheel_frame: rear_right_wheel_link
+joint_footprint_frame_base_frame:
+  name: base_joint
+joint_base_frame_left_steering_frame:
+  name: left_steering_joint
+joint_base_frame_right_steering_frame:
+  name: right_steering_joint
+joint_left_steering_frame_front_left_wheel_frame:
+  name: front_left_joint
+joint_right_steering_frame_front_right_wheel_frame:
+  name: front_right_joint
+joint_base_frame_rear_left_wheel_frame:
+  name: rear_left_joint
+joint_base_frame_rear_right_wheel_frame:
+  name: rear_right_joint
+meshes:
+  chassis:
+    package: r4c_description
+    relative_path: meshes/tractor_nh_t4_110f_chassis.stl
+  front_wheel:
+    package: r4c_description
+    relative_path: meshes/front_wheel.stl
+  rear_wheel:
+    package: r4c_description
+    relative_path: meshes/rear_wheel.stl
+plugins:
+  ackermann:
+    update_rate: 1000.0
+    ns: r4c_tractor
+    cmd_vel_topic: cmd_vel
+    odom_topic: odom_gzb
+    distance_topic: distance
+    left_steering_control:
+      p: 4000.0
+      i: 0.0
+      d: 100.0
+      i_range:
+        value1: 0.0
+        value2: 0.0
+    right_steering_control:
+      p: 4000.0
+      i: 0.0
+      d: 100.0
+      i_range:
+        value1: 0.0
+        value2: 0.0
+    linear_velocity_control:
+      p: 4000.0
+      i: 0.0
+      d: 1.0
+      i_range:
+        value1: 0.0
+        value2: 0.0
+    max_steer: 10.0
+    max_steering_angle: 7.85
+    max_speed: 10.0
+    publish_odom: true
+    publish_odom_tf: false
+    publish_wheel_tf: false
+    publish_distance: false
+    odometry_frame: odom
+    robot_base_frame: base_footprint
+  joint_state_publisher:
+    update_rate: 10.0
+    joint_state_topic: joint_states
+  p3d:
+    update_rate: 50.0
+    always_on: false
+    base_ground_truth_topic: /ground_truth/state
+    frame_name: map
+    body_name: base_footprint
+    offsets:
+      R: 0.0
+      P: 0.0
+      Y: 0.0
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    gaussian_noise: 0.01

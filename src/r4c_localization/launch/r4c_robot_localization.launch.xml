@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="datum"                            default="[37.9437328, 22.77204949]"/>
+    <arg name="navsat_transform_config_file"     default="$(find-pkg-share r4c_localization)/config/navsat_transform.yaml"/>
+    <arg name="global_filter_config_file"        default="$(find-pkg-share r4c_localization)/config/global.yaml"/>
+    <arg name="local_filter_config_file"         default="$(find-pkg-share r4c_localization)/config/local.yaml"/>
+
+    <arg name="heading_topic"                    default="/imu"/>
+    <arg name="output_odom_topic"                default="/odometry/global"/>
+    <arg name="gps_fix_topic"                    default="/gps/fix"/>
+    <arg name="filtered_gps_fix_topic"           default="/gps/filtered"/>
+
+    <node pkg="r4c_localization" exec="pub_datum_fix_node" name="pub_datum_fix_node" output="screen">
+        <param name="datum" value="$(var datum)"/>
+    </node>
+
+    <node pkg="robot_localization" exec="ekf_node" name="ekf_filter_node_global" output="screen">
+        <param from="$(var global_filter_config_file)"/>
+        <remap from="/odometry/filtered" to="$(var output_odom_topic)"/>
+    </node>
+
+    <node pkg="robot_localization" exec="navsat_transform_node" name="navsat_transform_node" output="screen">
+        <param from="$(var navsat_transform_config_file)"/>
+        <remap from="/imu/data" to="$(var heading_topic)"/>
+        <remap from="/odometry/filtered" to="$(var output_odom_topic)"/>
+        <remap from="/gps/fix" to="$(var gps_fix_topic)"/>
+        <remap from="/gps/filtered" to="$(var filtered_gps_fix_topic)"/>
+    </node>
+</launch>

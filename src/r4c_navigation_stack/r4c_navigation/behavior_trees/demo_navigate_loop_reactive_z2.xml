@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree drives a robot around two lines in an infinite loop,
+  switching between row following and transitioning navigation actions.
+
+  We assume the robot is properly localized and that the initial/end positions
+  of the lines (L1/L2) are known (see BlackBoard variables below).
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <!-- Farm configuration, use LoadControlPoint for loading coordinates in geometry_msgs PoseStamped format.
+                 (conversion from string does not work with nav2 default actions, but with this "loader" node) -->
+            <!-- NOTE: L1_INIT_ANTICIPATED is used in first action, as the tractor will be outside "real" line and would
+                 skip FollowPath action with default bounds. @todo: consider embeddind tolerance margins for the starting
+                 position. -->
+            <LoadControlPoint input="map; -1.0;  0.0; 0.0"     pose="{Z1_L1_INIT_ANTICIPATED}"/>
+
+            <!-- <LoadControlPoint input="map;  7.95;  114.57; -1.632821840219533"     pose="{Z1_L1_INIT}"/> -->
+            <!-- <LoadControlPoint input="map;  6.55;  111.34; -1.632821840219533"     pose="{Z1_L1_INIT}"/> -->
+            <LoadControlPoint input="map;  6.95;  111.34; -1.632821840219533"     pose="{Z1_L1_INIT}"/>
+            <!-- <LoadControlPoint input="map; 0.38;  -7.32; -1.632821840219533"     pose="{Z1_L1_END}"/> -->
+            <!-- <LoadControlPoint input="map; -0.575;  -9.26; -1.632821840219533"     pose="{Z1_L1_END}"/> -->
+            <LoadControlPoint input="map; -0.575;  -8.76; -1.632821840219533"     pose="{Z1_L1_END}"/>
+            <!-- <LoadControlPoint input="map;  19.14; 112.27; 1.5087708133702602" pose="{Z1_L2_INIT}"/> -->
+            <LoadControlPoint input="map;  18.4; 110.59; 1.5087708133702602" pose="{Z1_L2_INIT}"/>
+            <!-- <LoadControlPoint input="map; 11.46; -9.34; 1.5087708133702602" pose="{Z1_L2_END}"/> -->
+            <!-- <LoadControlPoint input="map; 10.89; -9.62; 1.5087708133702602" pose="{Z1_L2_END}"/> -->
+            <LoadControlPoint input="map; 10.70; -9.62; 1.5087708133702602" pose="{Z1_L2_END}"/>
+
+
+            <LoadControlPoint input="map; -0.82;  -24.53; -1.5707"     pose="{Z2_L1_INIT}"/>
+            <LoadControlPoint input="map; -8.52;  -149.18; -1.5707"     pose="{Z2_L1_END}"/>
+            <LoadControlPoint input="map; 10.59; -25.65; 1.5707" pose="{Z2_L2_INIT}"/>
+            <LoadControlPoint input="map; 2.72; -151.44; 1.5707" pose="{Z2_L2_END}"/>
+
+            <!-- Maneuver parameters (see bt_conversions.hpp) for syntax -->
+            <!-- From real experiments with the tractor, the approximate maneuver radius is of 3.8m,
+                 with a maximum maneuver distance of 5.0m. Therefore, the exit/entry distances are of 1.2m.
+                 We extend the entry distance a bit further to ensure the tractor enters the row straight. -->
+            <SetBlackboard output_key="MAN_PARAMS" value="map;1;1;False;5.5;7.5;4.5;0.2"/>
+            <SetBlackboard output_key="ROW_WIDTH" value="3.8"/>
+
+            <!-- Follow L1 in Z1 reactively -->
+            <!-- <PipelineSequence name="NavigateRow">
+                <RateController hz="2.0">
+                    <GetPathService path="{path}" path_updated="{path_updated}" service="/eut_crop_row_estimator/get_path" request_timeout="5.0"/>
+                </RateController>
+                <DoWhileInParcel src_node="{Z1_L1_INIT}" dst_node="{Z1_L1_END}" row_width="{ROW_WIDTH}" invert_logic="false">
+                    <FollowPath path="{path}" controller_id="ReactivePurePursuit" server_timeout="1000"/>
+                </DoWhileInParcel>
+            </PipelineSequence> -->
+
+            <!-- Go from end of L1 in Z1 to init of L1 in Z2-->
+            <!-- <ChangeWaypoints service_name="/planner_server/change_waypoints_file" waypoints_file="waypoints_l1_z1_z2"/>
+            <ComputePathToPose goal="{Z2_L1_INIT}" path="{path}" planner_id="WaypointBased"/>
+            <DoWhileInParcel src_node="{Z2_L1_INIT}" dst_node="{Z2_L1_END}" row_width="{ROW_WIDTH}" invert_logic="true">
+                <FollowPath path="{path}" controller_id="GlobalPurePursuit" server_timeout="1000"/>
+            </DoWhileInParcel> -->
+
+            <!-- Infinite loop over L1 and L2 in Z2 -->
+            <KeepRunningUntilFailure>
+                <Sequence>
+                    <PipelineSequence name="NavigateToPose">
+                        <RateController hz="2.0">
+                            <GetPathService path="{path}" path_updated="{path_updated}" service="/eut_crop_row_estimator/get_path" request_timeout="5.0"/>
+                        </RateController>
+                        <DoWhileInParcel src_node="{Z1_L1_INIT}" dst_node="{Z1_L1_END}" row_width="{ROW_WIDTH}" invert_logic="false">
+                            <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+                        </DoWhileInParcel>
+                    </PipelineSequence>
+
+                    <ComputeManeuverPath start="{Z1_L1_END}" goal="{Z1_L2_END}" maneuver_parameters="{MAN_PARAMS}" path="{path}"/>
+                    <DoWhileInParcel src_node="{Z1_L2_END}" dst_node="{Z1_L2_INIT}" row_width="{ROW_WIDTH}" invert_logic="true">
+                       <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+                    </DoWhileInParcel>
+
+                    <PipelineSequence name="NavigateToPose">
+                        <RateController hz="2.0">
+                            <GetPathService path="{path}" path_updated="{path_updated}" service="/eut_crop_row_estimator/get_path" request_timeout="5.0"/>
+                        </RateController>
+                        <DoWhileInParcel src_node="{Z1_L2_END}" dst_node="{Z1_L2_INIT}" row_width="{ROW_WIDTH}" invert_logic="false">
+                            <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+                        </DoWhileInParcel>
+                    </PipelineSequence>
+
+                    <ComputeManeuverPath start="{Z1_L2_INIT}" goal="{Z1_L1_INIT}" maneuver_parameters="{MAN_PARAMS}" path="{path}"/>
+                    <DoWhileInParcel src_node="{Z1_L1_INIT}" dst_node="{Z1_L1_END}" row_width="{ROW_WIDTH}" invert_logic="true">
+                        <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+                    </DoWhileInParcel>
+                </Sequence>
+            </KeepRunningUntilFailure>
+
+        </Sequence>
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

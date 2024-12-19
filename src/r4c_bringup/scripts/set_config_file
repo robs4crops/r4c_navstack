@@ -1,0 +1,17 @@
+#!/bin/bash
+
+src_config_file="${1}"
+dst_config_file="${2}"
+node_name="${3}"
+
+echo "Node name: ${node_name}"
+echo "Source config file: ${src_config_file}"
+echo "Destination config file: ${dst_config_file}"
+
+[ -e "${dst_config_file}" ] && echo "Removing ${dst_config_file} ..." && rm -f "${dst_config_file}"
+
+cp -v "${src_config_file}" "${dst_config_file}"
+
+sed -i "1s/.*/${node_name}:/" "${dst_config_file}"
+
+head -n2 "${dst_config_file}"

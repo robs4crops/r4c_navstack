@@ -1,0 +1,98 @@
+#!/bin/bash
+
+apt-get update
+apt-get -o Dpkg::Options::="--force-all" dist-upgrade --yes
+
+# In Robs4Crops, we agreed with partners to use Cyclone DDS (with a layer on top called zenoh) as
+# the DDS middlware.
+# Install Cyclone DDS dependencies.
+apt-get install --yes --quiet --no-install-recommends libcunit1-dev
+
+add-apt-repository ppa:ubuntu-toolchain-r/test --yes
+apt-get update
+apt-get -o Dpkg::Options::="--force-all" dist-upgrade --yes
+# Get the latest version of gcc automatically from the package repo.
+# gcc_version="$(apt-cache search gcc | awk '/^gcc-[0-9]{2} - / {print $1}' | cut -d- -f2 | sort -r | sed 1q)"
+gcc_version=11
+apt-get install --yes --quiet --no-install-recommends gcc-${gcc_version} g++-${gcc_version} gdb gdbserver
+
+update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${gcc_version} 100
+update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${gcc_version} 100
+update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-${gcc_version} 100
+update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-${gcc_version} 100
+
+# Latest stable clang (https://apt.llvm.org), so we can use latest clang-format and specially
+# clang-tidy (static code analysis).
+wget -O /tmp/llvm.sh https://apt.llvm.org/llvm.sh
+# Get the latest version of clang from the llvm script.
+clang_version="$(awk -F= '/CURRENT_LLVM_STABLE=/ {print $2}' /tmp/llvm.sh)"
+
+curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /usr/share/keyrings/llvm.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/llvm.gpg] http://apt.llvm.org/$(lsb_release -cs)/ llvm-toolchain-$(lsb_release -cs)-${clang_version} main" | tee /etc/apt/sources.list.d/llvm.list
+
+apt-get update
+apt-get -o Dpkg::Options::="--force-all" dist-upgrade --yes
+
+apt-get install --yes --quiet --no-install-recommends clang-${clang_version} lldb-${clang_version} lld-${clang_version} clangd-${clang_version} clang-tidy-${clang_version} clang-format-${clang_version} clang-tools-${clang_version} llvm-${clang_version}-dev llvm-${clang_version}-tools libomp-${clang_version}-dev libc++-${clang_version}-dev libc++abi-${clang_version}-dev libclang-common-${clang_version}-dev libclang-${clang_version}-dev libclang-cpp${clang_version}-dev libunwind-${clang_version}-dev
+
+update-alternatives --install /usr/bin/llvm-config           llvm-config           /usr/bin/llvm-config-${clang_version}           100
+update-alternatives --install /usr/bin/llvm-ar               llvm-ar               /usr/bin/llvm-ar-${clang_version}               100
+update-alternatives --install /usr/bin/llvm-as               llvm-as               /usr/bin/llvm-as-${clang_version}               100
+update-alternatives --install /usr/bin/llvm-bcanalyzer       llvm-bcanalyzer       /usr/bin/llvm-bcanalyzer-${clang_version}       100
+update-alternatives --install /usr/bin/llvm-cov              llvm-cov              /usr/bin/llvm-cov-${clang_version}              100
+update-alternatives --install /usr/bin/llvm-diff             llvm-diff             /usr/bin/llvm-diff-${clang_version}             100
+update-alternatives --install /usr/bin/llvm-dis              llvm-dis              /usr/bin/llvm-dis-${clang_version}              100
+update-alternatives --install /usr/bin/llvm-dwarfdump        llvm-dwarfdump        /usr/bin/llvm-dwarfdump-${clang_version}        100
+update-alternatives --install /usr/bin/llvm-extract          llvm-extract          /usr/bin/llvm-extract-${clang_version}          100
+update-alternatives --install /usr/bin/llvm-link             llvm-link             /usr/bin/llvm-link-${clang_version}             100
+update-alternatives --install /usr/bin/llvm-mc               llvm-mc               /usr/bin/llvm-mc-${clang_version}               100
+update-alternatives --install /usr/bin/llvm-nm               llvm-nm               /usr/bin/llvm-nm-${clang_version}               100
+update-alternatives --install /usr/bin/llvm-objcopy          llvm-objcopy          /usr/bin/llvm-objcopy-${clang_version}          100
+update-alternatives --install /usr/bin/llvm-objdump          llvm-objdump          /usr/bin/llvm-objdump-${clang_version}          100
+update-alternatives --install /usr/bin/llvm-ranlib           llvm-ranlib           /usr/bin/llvm-ranlib-${clang_version}           100
+update-alternatives --install /usr/bin/llvm-readobj          llvm-readobj          /usr/bin/llvm-readobj-${clang_version}          100
+update-alternatives --install /usr/bin/llvm-rtdyld           llvm-rtdyld           /usr/bin/llvm-rtdyld-${clang_version}           100
+update-alternatives --install /usr/bin/llvm-size             llvm-size             /usr/bin/llvm-size-${clang_version}             100
+update-alternatives --install /usr/bin/llvm-stress           llvm-stress           /usr/bin/llvm-stress-${clang_version}           100
+update-alternatives --install /usr/bin/llvm-strip            llvm-strip            /usr/bin/llvm-strip-${clang_version}            100
+update-alternatives --install /usr/bin/llvm-symbolizer       llvm-symbolizer       /usr/bin/llvm-symbolizer-${clang_version}       100
+update-alternatives --install /usr/bin/llvm-tblgen           llvm-tblgen           /usr/bin/llvm-tblgen-${clang_version}           100
+update-alternatives --install /usr/bin/clang                 clang                 /usr/bin/clang-${clang_version}                 100
+update-alternatives --install /usr/bin/clang++               clang++               /usr/bin/clang++-${clang_version}               100
+update-alternatives --install /usr/bin/asan_symbolize        asan_symbolize        /usr/bin/asan_symbolize-${clang_version}        100
+update-alternatives --install /usr/bin/c-index-test          c-index-test          /usr/bin/c-index-test-${clang_version}          100
+update-alternatives --install /usr/bin/clang-check           clang-check           /usr/bin/clang-check-${clang_version}           100
+update-alternatives --install /usr/bin/clang-cl              clang-cl              /usr/bin/clang-cl-${clang_version}              100
+update-alternatives --install /usr/bin/clang-cpp             clang-cpp             /usr/bin/clang-cpp-${clang_version}             100
+update-alternatives --install /usr/bin/clang-format          clang-format          /usr/bin/clang-format-${clang_version}          100
+update-alternatives --install /usr/bin/clang-format-diff     clang-format-diff     /usr/bin/clang-format-diff-${clang_version}     100
+update-alternatives --install /usr/bin/clang-include-fixer   clang-include-fixer   /usr/bin/clang-include-fixer-${clang_version}   100
+update-alternatives --install /usr/bin/clang-offload-bundler clang-offload-bundler /usr/bin/clang-offload-bundler-${clang_version} 100
+update-alternatives --install /usr/bin/clang-query           clang-query           /usr/bin/clang-query-${clang_version}           100
+update-alternatives --install /usr/bin/clang-rename          clang-rename          /usr/bin/clang-rename-${clang_version}          100
+update-alternatives --install /usr/bin/clang-reorder-fields  clang-reorder-fields  /usr/bin/clang-reorder-fields-${clang_version}  100
+update-alternatives --install /usr/bin/clang-tidy            clang-tidy            /usr/bin/clang-tidy-${clang_version}            100
+update-alternatives --install /usr/bin/ld.lld                ld.lld                /usr/bin/ld.lld-${clang_version}                100
+update-alternatives --install /usr/bin/lld                   lld                   /usr/bin/lld-${clang_version}                   100
+update-alternatives --install /usr/bin/lld-link              lld-link	             /usr/bin/lld-link-${clang_version}              100
+update-alternatives --install /usr/bin/lldb                  lldb                  /usr/bin/lldb-${clang_version}                  100
+update-alternatives --install /usr/bin/lldb-server           lldb-server           /usr/bin/lldb-server-${clang_version}           100
+
+rm /tmp/llvm.sh
+
+# Install non-ROS packages.
+apt-get install --yes --quiet --no-install-recommends can-utils \
+  joystick \
+  jstest-gtk \
+  libgeographic-dev \
+  libopencv-dev \
+  libpcap-dev \
+  libpcl-dev \
+  libsocketcan-dev \
+  libsocketcan2 \
+  libyaml-cpp-dev \
+  pybind11-dev
+
+apt-get clean autoclean
+apt-get autoremove --yes
+rm -rf /var/lib/apt/lists/*

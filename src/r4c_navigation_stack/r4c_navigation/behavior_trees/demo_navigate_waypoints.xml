@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree drives a robot around two lines in an infinite loop,
+  switching between row following and transitioning navigation actions.
+
+  We assume the robot is properly localized and that the initial/end positions
+  of the lines (L1/L2) are known (see BlackBoard variables below).
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>         
+
+            <LoadControlPoint input="odom; 0.0; 10.0; 3.14159" pose="{POSE_END}"/>
+            <SetBlackboard output_key="MAN_PARAMS" value="map;1;1;False;1.2;2.4;3.8;0.2"/>
+            
+            <KeepRunningUntilFailure>
+                <Sequence>
+                    <ChangeWaypoints service_name="/planner_server/change_waypoints_file" waypoints_file="waypoints_ab_lines_length_10m_radius_5m"/>
+                    <ComputePathToPose goal="{POSE_END}" path="{path}" planner_id="WaypointBased"/>
+                    <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+                </Sequence>
+            </KeepRunningUntilFailure>
+
+        </Sequence>
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

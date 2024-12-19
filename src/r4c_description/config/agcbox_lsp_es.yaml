@@ -1,0 +1,51 @@
+name: agcbox
+size:
+  x: 0.1796
+  y: 0.1796
+  z: 0.1021
+mass: 0.870
+color:
+  r: 1.0
+  g: 1.0
+  b: 1.0
+  a: 0.7
+parent_frame: base_link
+base_frame: agcbox_base_link
+body_frame: agcbox_body_link
+imu_frame: agcbox_imu_link
+gnss_frame: agcbox_gnss_link
+joint_parent_frame_base_frame:
+  name: agcbox_base_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.74
+  y: 0.0
+  z: 1.875
+joint_base_frame_body_frame:
+  name: agcbox_body_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.0511
+joint_body_frame_imu_frame:
+  name: agcbox_imu_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: -0.0196
+joint_body_frame_gnss_frame:
+  name: agcbox_gnss_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.012
+mesh:
+  package: r4c_description
+  relative_path: meshes/agcbox.stl

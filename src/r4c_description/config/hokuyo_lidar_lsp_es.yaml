@@ -1,0 +1,64 @@
+name: hokuyo_utm_30lx
+size:
+  x: 0.060
+  y: 0.060
+  z: 0.0874310
+mass: 0.370
+color:
+  r: 0.0
+  g: 0.0
+  b: 0.0
+  a: 0.7
+parent_frame: base_link
+base_frame: front_hokuyo_base_link
+body_frame: front_hokuyo_body_link
+data_frame: front_hokuyo_link
+joint_parent_frame_base_frame:
+  name: front_hokuyo_base_joint
+# 3.141592654
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 3.0
+  y: 0.0
+  z: -0.2
+joint_base_frame_body_frame:
+  name: front_hokuyo_body_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.0437155
+joint_body_frame_data_frame:
+  name: front_hokuyo_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.0172845
+mesh:
+  package: r4c_description
+  relative_path: meshes/hokuyo_utm_30lx.stl
+plugin:
+  enabled: 1
+  visualize: false
+  update_rate: 10.0
+  topic: front_hokuyo/out
+# samples = (max_angle - min_angle)/resolution + 1
+#         = (180 - -180)/resolution + 1
+#         = 360/0.25 + 1
+#         = 1441
+  horizontal_scanning:
+    min_angle: -3.141592654
+    max_angle: 3.141592654
+    samples: 1441
+  range:
+    min: 0.10
+    max: 30.0
+    resolution: 0.01
+  noise:
+    type: gaussian
+    mean: 0.0
+    stddev: 0.01

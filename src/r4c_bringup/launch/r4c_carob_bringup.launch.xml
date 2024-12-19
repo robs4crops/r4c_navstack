@@ -1,0 +1,393 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- ************************************************************************ -->
+  <!-- COMMON ARGS -->
+  <!-- ************************************************************************ -->
+
+  <let name="simulation"             value="false"/>
+  <set_parameter name="use_sim_time" value="$(var simulation)"/>
+
+  <let name="robot_model_name"       value="r4c_tractor"/> <!-- r4c_carob -->
+  <arg name="large_scale_pilot"      default="gr"/>
+
+  <arg name="odometry_frame"         default="odom"/>
+  <arg name="robot_base_frame"       default="base_footprint"/>
+
+  <arg name="twist_topic"            default="$(var robot_model_name)/vel"/>
+  <arg name="twist_cmd_topic"        default="$(var robot_model_name)/cmd_vel"/>
+  <arg name="joint_states_topic"     default="joint_states"/>
+  <arg name="wheel_odometry_topic"   default="$(var robot_model_name)/wheel_odom"/>
+  <arg name="lidar_odometry_topic"   default="Odometry"/> <!-- $(var robot_model_name)/lidar_odom -->
+
+  <!-- ************************************************************************ -->
+  <!-- ROBOT DESCRIPTION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="robot_description_file" default="$(find-pkg-share r4c_description)/urdf/r4c_carob.xacro"/>
+
+  <node pkg="robot_state_publisher" exec="robot_state_publisher">
+    <param name='robot_description' value="$(command 'xacro $(var robot_description_file)')"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- DIFFERENTIAL DRIVE TELEOPERATION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_teleoperation" default="false"/>
+
+  <arg name="teleop_config_file" default="$(find-pkg-share r4c_bringup)/config/carob_teleoperation.yaml"/>
+  <arg name="teleop_twist_topic" default="$(var robot_model_name)/teleop_vel"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/differential_teleoperation.launch.xml" if="$(var use_teleoperation)">
+    <arg name="teleop_config_file" value="$(var teleop_config_file)"/>
+    <arg name="joy_topic"          value="$(var robot_model_name)/joy"/>
+    <arg name="teleop_twist_topic" value="$(var teleop_twist_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- TWIST MUX -->
+  <!-- ************************************************************************ -->
+
+  <arg name="twist_mux_topics_locks_config_file" default="$(find-pkg-share r4c_bringup)/config/carob_twist_mux_topics_locks.yaml"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/twist_mux.launch.py">
+    <arg name="config_file" value="$(var twist_mux_topics_locks_config_file)"/>
+    <arg name="cmd_vel_out" value="$(var twist_cmd_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- GROUND VEHICLE ODOMETRY BY TWIST -->
+  <!-- ************************************************************************ -->
+
+  <arg name="ground_vehicle_twist_odometry_param_file" default="$(find-pkg-share r4c_bringup)/config/carob_twist_odometry_slam.yaml" if="$(var use_slam)"/>
+  <arg name="ground_vehicle_twist_odometry_param_file" default="$(find-pkg-share r4c_bringup)/config/carob_twist_odometry_no_slam.yaml" unless="$(var use_slam)"/>
+
+  <node pkg="eut_ground_vehicle_twist_odometry" exec="ground_vehicle_twist_odometry_node" name="ground_vehicle_twist_odometry" output="screen">
+    <param from="$(var ground_vehicle_twist_odometry_param_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- NAVIGATION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_navigation"              default="false"/>
+  <arg name="nav_config_file"             default="$(find-pkg-share r4c_navigation)/config/r4c_navigation_gr_carob.yaml"/>
+  <arg name="navigation_map_file"         default="$(find-pkg-share r4c_navigation)/farms/lspg/costmap.yaml"/>
+  <arg name="waypoints_file"              default="$(find-pkg-share r4c_navigation)/waypoints/waypoints_ab_lines_length_10m_radius_5m.csv"/>
+  <arg name="navigation_tree"             default="navigate_to_pose"/>
+  <arg name="navigation_tree_file"        default="$(find-pkg-share r4c_navigation)/behavior_trees/$(var navigation_tree).xml"/>
+
+  <include file="$(find-pkg-share r4c_navigation)/launch/r4c_navigation.launch.py" if="$(var use_navigation)">
+    <arg name="use_sim_time"             value="$(var simulation)"/>
+    <arg name="params_file"              value="$(var nav_config_file)"/>
+    <arg name="robot_base_frame"         value="$(var robot_base_frame)"/>
+    <arg name="odom_topic"               value="$(var wheel_odometry_topic)"/>
+    <arg name="waypoints_file"           value="$(var waypoints_file)"/>
+    <arg name="map"                      value="$(var navigation_map_file)"/>
+    <arg name="default_bt_xml_filename"  value="$(var navigation_tree_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- MANEUVER GENERATION SERVER -->
+  <!-- ************************************************************************ -->
+
+  <node pkg="eut_maneuver_generation" exec="maneuver_generator_server" output="screen"/>
+
+  <!-- ************************************************************************ -->
+  <!-- SENSORS -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rslidar"           default="false"/>
+  <arg name="use_um7"               default="false"/>
+  <arg name="use_livox"             default="false"/>
+  <arg name="use_mid360"            default="false"/>
+  <arg name="use_oakd"              default="false"/>
+  <arg name="use_ublox"             default="false"/>
+  <arg name="use_yolo"              default="false"/>
+
+  <arg name="rslidar_topic"         default="/rslidar_points"/>
+  <arg name="livox_lidar_topic"     default="livox/lidar"/>
+
+  <arg name="um7_data_topic"        default="um7/imu/data"/>
+  <arg name="um7_mag_topic"         default="um7/imu/mag"/>
+  <arg name="um7_rpy_topic"         default="um7/imu/rpy"/>
+  <arg name="um7_temperature_topic" default="um7/imu/temperature"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/r4c_sensors.launch.xml">
+    <arg name="use_rslidar"           value="$(var use_rslidar)"/>
+    <arg name="use_um7"               value="$(var use_um7)"/>
+    <arg name="use_livox"             value="$(var use_livox)"/>
+    <arg name="use_mid360"            value="$(var use_mid360)"/>
+    <arg name="use_oakd"              value="$(var use_oakd)"/>
+    <arg name="use_ublox"             value="$(var use_ublox)"/>
+    <arg name="um7_data_topic"        value="$(var um7_data_topic)"/>
+    <arg name="um7_mag_topic"         value="$(var um7_mag_topic)"/>
+    <arg name="um7_rpy_topic"         value="$(var um7_rpy_topic)"/>
+    <arg name="um7_temperature_topic" value="$(var um7_temperature_topic)"/>
+    <arg name="livox_lidar_topic"     value="$(var livox_lidar_topic)"/>
+  </include>
+
+  <include file="$(find-pkg-share eut_pcl_utils)/launch/livox_repub.launch.xml" if="$(var use_mid360)"/>
+
+  <!-- ************************************************************************ -->
+  <!-- LOCALIZATION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_localization"  default="false"/>
+  <arg name="use_slam"          default="false"/>
+  <!--
+  slam_sensor can be either 'rslidar', 'avia' or 'mid70', but for the time being we consider only
+  rslidar or avia depending on the value of the flag use_rslidar and use_livox.
+  -->
+  <arg name="slam_sensor"       default="rslidar" if="$(var use_rslidar)"/>
+  <arg name="slam_sensor"       default="mid360"  if="$(var use_mid360)"/>
+
+  <arg name="rslidar_converted_topic" default="/rslidar_converted"/>
+
+  <arg name="datum"                          default="[37.943822399999995, 22.7721113]" />
+  <arg name="navsat_transform_config_file"   default="$(find-pkg-share r4c_localization)/config/navsat_transform_gr.yaml"/>
+  <arg name="global_filter_config_file"      default="$(find-pkg-share r4c_localization)/config/robot_localization_global_slam_gr.yaml"    if="$(var use_slam)"/>
+  <arg name="global_filter_config_file"      default="$(find-pkg-share r4c_localization)/config/robot_localization_global_no_slam_gr.yaml" unless="$(var use_slam)"/>
+  <arg name="heading_topic"                  default="/r4c_tractor/agcbox/heading_imu"/>
+  <arg name="output_odom_topic"              default="/odometry/global"/>
+  <arg name="gps_fix_topic"                  default="/r4c_tractor/agcbox/gnss/wgs84_fix"/>
+  <arg name="filtered_gps_fix_topic"         default="/r4c_tractor/nobu/gnss/wgs84_fix"/>
+
+  <group if="$(var use_localization)">
+
+    <include file="$(find-pkg-share r4c_localization)/launch/r4c_robot_localization.launch.xml">
+      <arg name="datum"                           value="$(var datum)"/>
+      <arg name="navsat_transform_config_file"    value="$(var navsat_transform_config_file)"/>
+      <arg name="global_filter_config_file"       value="$(var global_filter_config_file)"/>
+      <arg name="heading_topic"                   value="$(var heading_topic)"/>
+      <arg name="output_odom_topic"               value="$(var output_odom_topic)"/>
+      <arg name="gps_fix_topic"                   value="$(var gps_fix_topic)"/>
+      <arg name="filtered_gps_fix_topic"          value="$(var filtered_gps_fix_topic)"/>
+    </include>
+
+    <group if="$(var use_slam)">
+
+      <node pkg="eut_pcl_utils" exec="rshelios_converter_node" name="rshelios_converter" output="screen" if="$(var use_rslidar)" >
+        <remap from="/rslidar_points"    to="$(var rslidar_topic)"/>
+        <remap from="/rslidar_converted" to="$(var rslidar_converted_topic)"/>
+      </node>
+
+      <include file="$(find-pkg-share eut_fast_lio)/launch/eut_fast_lio.launch.py">
+        <arg name="config_path" value="$(find-pkg-share r4c_localization)/config/eut_fast_lio_$(var slam_sensor)_gr_carob.yaml"/>
+      </include>
+    </group>
+
+  </group>
+  <!-- ************************************************************************ -->
+  <!-- CLOUD ASSEMBLER -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_cloud_assembler"                   default="false"/>
+  <arg name="cloud_assembler_input_cloud_topic"     default="/cloud_registered"/> <!-- Published by eut_fast_lio -->
+  <arg name="cloud_assembler_assembled_cloud_topic" default="assembled_cloud"/>
+  <arg name="cloud_assembler_buffer_size"           default="10"/>
+  <arg name="cloud_assembler_use_circular_buffer"   default="true"/>
+
+  <include file="$(find-pkg-share eut_pcl_utils)/launch/cloud_assembler.launch.xml" if="$(var use_cloud_assembler)">
+    <arg name="odometry_topic"        value="$(var lidar_odometry_topic)"/>
+    <arg name="input_cloud_topic"     value="$(var cloud_assembler_input_cloud_topic)"/>
+    <arg name="assembled_cloud_topic" value="$(var cloud_assembler_assembled_cloud_topic)"/>
+    <arg name="buffer_size"           value="$(var cloud_assembler_buffer_size)"/>
+    <arg name="use_circular_buffer"   value="$(var cloud_assembler_use_circular_buffer)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- TRUNK DETECTOR -->
+  <!-- ************************************************************************ -->
+
+  <!-- For the time being we only detect trunks with the livox lidar -->
+
+  <arg name="use_trunk_detector"         default="false"/>
+  <arg name="trunk_detector_config_file" default="$(find-pkg-share r4c_bringup)/config/livox_trunk_detector.yaml"/>
+  <arg name="trunk_detector_topic"       default="trunk_detections"/>
+
+  <include file="$(find-pkg-share eut_laser_trunk_detector)/launch/livox_trunk_detector.launch.xml" if="$(var use_trunk_detector)">
+    <arg name="config_file"           value="$(var trunk_detector_config_file)"/>
+    <arg name="assembled_cloud_topic" value="$(var cloud_assembler_assembled_cloud_topic)"/>
+    <arg name="trunks_topic"          value="$(var trunk_detector_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- HALLWAY DETECTOR -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_hallway_detector"                default="false"/>
+  <arg name="hallway_detector_name"               default="hallway_detector"/>
+
+  <let name="hallway_detector_config_file"        value="$(find-pkg-share r4c_bringup)/config/rs_hallway_detector_gr_carob.yaml" if="$(var use_rslidar)"/>
+  <let name="hallway_detector_config_file"        value="$(find-pkg-share r4c_bringup)/config/mid360_hallway_detector_gr_carob.yaml" if="$(var use_mid360)"/>
+
+  <let name="non_filtered_hallway_detector_input_cloud_topic"  value="/rslidar_points" if="$(var use_rslidar)"/>
+  <let name="non_filtered_hallway_detector_input_cloud_topic"  value="/livox/cloud" if="$(var use_mid360)"/>
+
+  <let name="hallway_detector_input_cloud_topic"  value="/rslidar/filtered" if="$(var use_rslidar)"/>
+  <let name="hallway_detector_input_cloud_topic"  value="/livox/cloud/filtered" if="$(var use_mid360)"/>
+
+  <let name="hallway_detector_line_markers_topic" value="/$(var hallway_detector_name)/line_markers"/>
+
+  <group if="$(var use_hallway_detector)">
+
+    <node pkg="eut_pcl_utils" exec="rslidar_horizontal_angle_range_filter_node" name="rslidar_filter" output="screen">
+      <param name="min_angle" value="-3.14"/>
+      <param name="max_angle" value="3.14"/>
+      <param name="min_range" value="0.5"/>
+      <param name="max_range" value="200.0"/>
+      <remap from="/rslidar_points"          to="$(var non_filtered_hallway_detector_input_cloud_topic)"/>
+      <remap from="/rslidar_points/filtered" to="$(var hallway_detector_input_cloud_topic)"/>
+    </node>
+
+    <include file="$(find-pkg-share eut_hallway_detector)/launch/hallway_detector.launch.xml">
+      <arg name="node_name"          value="$(var hallway_detector_name)"/>
+      <arg name="config_file"        value="$(var hallway_detector_config_file)"/>
+      <arg name="input_cloud_topic"  value="$(var hallway_detector_input_cloud_topic)"/>
+      <arg name="line_markers_topic" value="$(var hallway_detector_line_markers_topic)"/>
+    </include>
+  </group>
+
+  <!-- ************************************************************************ -->
+  <!-- CROP ROW PATH ESTIMATOR -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_crop_row_estimator"            default="false"/>
+  <arg name="crop_row_estimator_name"           default="simple_crop_row_estimator"/>
+
+  <arg name="crop_row_estimator_config_file"    default="$(find-pkg-share r4c_bringup)/config/crop_row_estimator_gr_carob.yaml"/>
+
+  <arg name="crop_row_estimator_global_plan_topic" default="/central_line"/>
+
+  <group if="$(var use_crop_row_estimator)">
+    <include file="$(find-pkg-share eut_crop_row_estimator)/launch/crop_row_estimator.launch.xml">
+      <arg name="node_name"          value="$(var crop_row_estimator_name)"/>
+      <arg name="config_file"        value="$(var crop_row_estimator_config_file)"/>
+      <arg name="trunks_topic"       value="$(var trunk_detector_topic)"/>
+      <arg name="lines_topic"        value="$(var hallway_detector_line_markers_topic)"/>
+      <arg name="global_plan_topic"  value="$(var crop_row_estimator_global_plan_topic)"/>
+    </include>
+  </group>
+
+  <!-- ************************************************************************ -->
+  <!-- DIFFERENTIAL DRIVE TWIST TO JOINT STATES -->
+  <!-- ************************************************************************ -->
+
+  <arg name="diff_drive_twist_to_joint_states_config_file" default="$(find-pkg-share r4c_description)/config/diff_drive_twist_to_joint_states.yaml"/>
+
+  <node pkg="r4c_description" exec="diff_drive_twist_to_joint_states_node" name="diff_drive_twist_to_joint_states" output="screen">
+    <param from="$(var diff_drive_twist_to_joint_states_config_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- CAN BUS COMM -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_can_bus_comm"                     default="false"/>
+  <arg name="can_dev"                              default="can0"/>
+  <arg name="can2ros_adapter_input_can_msg_topic"  default="can_msg_from_can_bus"/>
+  <arg name="ros2can_adapter_output_can_msg_topic" default="can_msg_to_can_bus"/>
+
+  <include if="$(var use_can_bus_comm)" file="$(find-pkg-share can_bus_comm)/launch/can_bus_bridge.xml">
+    <arg name="can_dev"                 value="$(var can_dev)"/>
+    <arg name="can_msg_topic_to_pub"    value="$(var can2ros_adapter_input_can_msg_topic)"/>
+    <arg name="can_msg_topic_to_sub"    value="$(var ros2can_adapter_output_can_msg_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- CAN ADAPTERS -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_can2ros_adapter"          default="false"/>
+  <arg name="use_ros2can_adapter"          default="false"/>
+  <arg name="r4c_can_adapters_params_file" default="$(find-pkg-share r4c_can_adapter)/config/can_adapters_carob_$(var large_scale_pilot).yaml"/>
+
+  <include file="$(find-pkg-share r4c_can_adapter)/launch/carob_can2ros_adapter.launch.xml" if="$(var use_can2ros_adapter)">
+    <arg name="can_adapters_params_file" value="$(var r4c_can_adapters_params_file)"/>
+  </include>
+
+  <include file="$(find-pkg-share r4c_can_adapter)/launch/carob_ros2can_adapter.launch.xml" if="$(var use_ros2can_adapter)">
+    <arg name="can_adapters_params_file" value="$(var r4c_can_adapters_params_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- AGCBOX ENS EMULATOR -->
+  <!-- ************************************************************************ -->
+
+  <node pkg="r4c_can_adapter" exec="agcbox_ens_emulator_node" name="agcbox_ens_emulator" output="screen">
+    <param from="$(var r4c_can_adapters_params_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- ODOM GNSS PUBLISHER -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_odom_gnss"             default="false"/>
+  <arg name="odom_gnss_config_file"     default="$(find-pkg-share r4c_bringup)/config/odom_gnss_publisher.yaml"/>
+  <arg name="odom_gnss_topic"           default="$(var robot_model_name)/odom_gnss"/>
+  <arg name="r4c_gnss_init_config_file" default="$(find-pkg-share r4c_bringup)/config/r4c_gnss_init_carob.yaml"/>
+
+  <group if="$(var use_odom_gnss)">
+
+    <node pkg="r4c_bringup" exec="r4c_gnss_init_node" name="r4c_gnss_init" output="screen">
+      <param from="$(var r4c_gnss_init_config_file)"/>
+    </node>
+
+    <node pkg="robot_localization" exec="navsat_transform_node" name="odom_gnss_publisher" output="screen">
+      <param from="$(var odom_gnss_config_file)"/>
+      <remap from="odometry/filtered" to="$(var lidar_odometry_topic)"/>
+      <remap from="gps/filtered"      to="$(var odom_gnss_topic)"/>
+    </node>
+  </group>
+
+  <!-- ************************************************************************ -->
+  <!-- R4C COMMANDER -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_commander"           default="false"/>
+  <arg name="commander_config_file"   default="$(find-pkg-share r4c_commander)/config/r4c_commander_config_gr_carob.yaml"/>
+
+  <include file="$(find-pkg-share r4c_commander)/launch/r4c_commander.launch.xml" if="$(var use_commander)">
+    <arg name="r4c_commander_params_file" value="$(var commander_config_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- SYSTEM REPORTER -->
+  <!-- ************************************************************************ -->
+
+  <arg name="r4c_reporter_params_file"   default="$(find-pkg-share r4c_reporter)/config/r4c_reporter_config_gr_carob.yaml"/>
+
+  <include file="$(find-pkg-share r4c_reporter)/launch/r4c_reporter.launch.xml">
+    <arg name="use_oakd"                  value="$(var use_oakd)"/>
+    <arg name="use_um7"                   value="$(var use_um7)"/>
+    <arg name="use_rslidar"               value="$(var use_rslidar)"/>
+    <arg name="use_livox"                 value="$(var use_livox)"/>
+    <arg name="use_ublox"                 value="$(var use_ublox)"/>
+    <arg name="use_can"                   value="$(var use_can_bus_comm)"/>
+    <arg name="r4c_reporter_params_file"  value="$(var r4c_reporter_params_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- FC WEB SERVER -->
+  <!-- ************************************************************************ -->
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/r4c_web_server.launch.xml">
+    <arg name="large_scale_pilot"  value="$(var large_scale_pilot)"/>
+    <arg name="input_camera_topic" value="/oakd/color/image"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- RVIZ -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rviz"         default="false"/>
+  <arg name="rviz_config_file" default="$(find-pkg-share r4c_bringup)/rviz/r4c.rviz"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/rviz.launch.xml" if="$(var use_rviz)">
+    <arg name="config_file" value="$(var rviz_config_file)"/>
+  </include>
+
+</launch>

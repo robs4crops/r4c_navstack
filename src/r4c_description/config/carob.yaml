@@ -1,0 +1,38 @@
+name: r4c_carob
+wheel_spacing:        1.01722
+wheel_radius:         0.391
+wheelbase_to_centre:  0.323
+mesh:
+  package: r4c_description
+  relative_path: meshes/eut_carob_full.stl
+plugins:
+  differential:
+    update_rate: 100.0
+    cmd_vel_topic: r4c_tractor/cmd_vel
+    odom_topic: r4c_tractor/odom_gzb
+    left_joint: left_axle
+    right_joint: right_axle
+    max_wheel_torque: 200.0
+    max_wheel_acceleration: 10.0
+    odometry_frame: odom
+    robot_base_frame: base_link
+    publish_odom: true
+    publish_odom_tf: false
+    publish_wheel_tf: false
+  joint_state_publisher:
+    update_rate: 5.0
+    joint_state_topic: joint_states
+  p3d:
+    update_rate: 50.0
+    always_on: false
+    base_ground_truth_topic: /ground_truth/state
+    frame_name: map
+    body_name: base_footprint
+    offsets:
+      R: 0.0
+      P: 0.0
+      Y: 0.0
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    gaussian_noise: 0.01

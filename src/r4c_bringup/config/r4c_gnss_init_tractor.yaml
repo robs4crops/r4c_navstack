@@ -1,0 +1,6 @@
+r4c_gnss_init:
+  ros__parameters:
+    agcbox_gnss_metadata_topic:  r4c_tractor/agcbox/gnss/metadata
+    agcbox_heading_topic:        r4c_tractor/agcbox/heading_imu
+    agcbox_gnss_wgs84_fix_topic: r4c_tractor/agcbox/gnss/wgs84_fix
+    datum_service:               datum

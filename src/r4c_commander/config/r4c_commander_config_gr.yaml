@@ -1,0 +1,26 @@
+r4c_commander:
+  ros__parameters:
+    mission_server_name: "/lspg/navigation"
+    navsat_service_name: "/fromLL"
+    nav2_client_name : "/navigate_through_poses"
+    inrow_bt_name : "inrow_navigation_gr.xml"
+    maneuver_bt_name : "free_maneuver_gr.xml"
+    free_bt_name : "free_navigation_gr.xml"
+    mission_frame: "map"
+    start_mission_service: "/lspg/Start_Srv"
+    pause_mission_service: "/lspg/Pause_Srv"
+    stop_mission_service: "/lspg/Stop_Srv"
+    navsatfix_topic_name: "/r4c_tractor/nobu/gnss/wgs84_fix"
+    velocity_topic_name: "/r4c_tractor/vel"
+    navigation_zero_speed_topic: "/r4c_tractor/zero_nav_cmd_vel"
+    status_topic_name: "/lspg/tractor_status"
+
+fc_diagnostic_publisher:
+  ros__parameters:
+    diagnostic_frequency: 1.0
+    navsat_fix_topic_name: "/r4c_tractor/nobu/gnss/wgs84_fix"
+    velocity_topic_name: "/r4c_tractor/vel"
+    diagnostic_trigger_topic_name: "/lspg/trigger_flag"
+    diagnostic_emergency_stop_topic_name: "/lspg/emergency_stop_flag"
+    diagnostic_speed_topic_name: "/lspg/speed"
+    diagnostic_navsatfix_topic_name: "/lspg/Nav"

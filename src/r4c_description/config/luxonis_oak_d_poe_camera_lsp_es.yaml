@@ -1,0 +1,29 @@
+name: oak
+model: OAK-D-POE
+color:
+  r: 0.8
+  g: 0.8
+  b: 0.8
+  a: 0.8
+parent_frame: sensor_platform_link
+base_frame: oak_base_link
+joint_parent_frame_base_frame:
+  name: oak_center_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.01
+  y: 0.0
+  z: 0.11
+mesh:
+  package: depthai_descriptions
+  relative_path: urdf/models/OAK-D-POE.stl
+plugin:
+  always_on: true
+  rate: 30.0
+  horizontal_fov: 1.3962634
+  width: 500
+  height: 500
+  camera_name: camera1
+  image_topic: /image
+  info_topic: /camera_info

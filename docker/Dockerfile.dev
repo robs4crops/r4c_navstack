@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1
+
+ARG docker_base_image
+
+FROM ${docker_base_image}
+LABEL maintainer=eutrob@eurecat.org
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+USER root
+WORKDIR /
+
+COPY ./system_packages_installation_script /tmp/system_packages_installation_script
+COPY ./ros_packages_installation_script /tmp/ros_packages_installation_script
+
+ARG docker_image_building_timestamp
+ENV DOCKER_IMAGE_BUILDING_TIMESTAMP="${docker_image_building_timestamp}"
+
+RUN <<EOF
+#!/usr/bin/env bash
+
+chmod +x /tmp/system_packages_installation_script
+/tmp/system_packages_installation_script
+rm -f /tmp/system_packages_installation_script
+EOF
+
+RUN <<EOF
+#!/usr/bin/env bash
+
+chmod +x /tmp/ros_packages_installation_script
+/tmp/ros_packages_installation_script
+rm -f /tmp/ros_packages_installation_script
+EOF
+
+# You can confirm the DDS implementation in used in your environment by using the command:
+# ros2 doctor --report
+
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+
+# Extracted from gzserver Dockerfile
+EXPOSE 11345
+
+USER "${IMG_USER}"
+WORKDIR "/home/${IMG_USER}"

@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- ************************************************************************ -->
+  <!-- COMMON ARGS -->
+  <!-- ************************************************************************ -->
+
+  <let name="simulation"             value="true"/>
+  <set_parameter name="use_sim_time" value="$(var simulation)"/>
+
+  <let name="robot_model_name"       value="r4c_tractor"/>
+  <arg name="large_scale_pilot"      default="gr"/>
+
+  <arg name="odometry_frame"         default="odom"/>
+  <arg name="robot_base_frame"       default="base_footprint"/>
+
+  <arg name="twist_topic"            default="$(var robot_model_name)/vel"/>
+  <arg name="twist_cmd_topic"        default="$(var robot_model_name)/cmd_vel"/>
+  <arg name="joint_states_topic"     default="joint_states"/>
+  <arg name="wheel_odometry_topic"   default="$(var robot_model_name)/wheel_odom"/>
+  <arg name="lidar_odometry_topic"   default="Odometry" /> <!-- TODO@juan.rascon: change this topic to $(var robot_model_name)/lidar_odom -->
+
+  <!-- ************************************************************************ -->
+  <!-- GAZEBO LAUNCH -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_gzb_gui" default="false"/>
+  <arg name="roll"        default="0.0"/>
+  <arg name="pitch"       default="0.0"/>
+  <arg name="yaw"         default="-0.785"/>
+  <arg name="x"           default="0.5545"/>
+  <arg name="y"           default="1.17179"/>
+  <arg name="z"           default="0.0"/>
+  <arg name="world"       default="pegasus.world"/>
+
+  <include file="$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py">
+    <arg name="gui"   value="$(var use_gzb_gui)"/>
+    <arg name="world" value="$(find-pkg-share r4c_simulation)/worlds/$(var world)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- GAZEBO ROS -->
+  <!-- ************************************************************************ -->
+
+  <node pkg="gazebo_ros" exec="spawn_entity.py" args="-topic robot_description -entity $(var robot_model_name) -x $(var x) -y $(var y) -z $(var z) -R $(var roll) -P $(var pitch) -Y $(var yaw)"/>
+
+  <!-- ************************************************************************ -->
+  <!-- ROBOT DESCRIPTION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="robot_description_file" default="$(find-pkg-share r4c_description)/urdf/r4c_tractor.xacro"/>
+
+  <node pkg="robot_state_publisher" exec="robot_state_publisher">
+    <param name='robot_description' value="$(command 'xacro $(var robot_description_file)')"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- ACKERMANN DRIVE TELEOPERATION -->
+  <!-- ************************************************************************ -->
+
+   <!---
+  <arg name="teleop_config_file" default="$(find-pkg-share r4c_bringup)/config/tractor_nh_t4_110f_teleoperation.yaml"/>
+  <arg name="teleop_twist_topic" default="$(var robot_model_name)/teleop_vel"/>
+
+  <include file="$(find-pkg-share ackermann_teleop)/launch/ackermann_teleoperation.launch.xml">
+    <arg name="config_file" value="$(var teleop_config_file)"/>
+    <arg name="joy_topic"          value="$(var robot_model_name)/joy"/>
+    <arg name="twist_topic"        value="$(var teleop_twist_topic)"/>
+  </include>
+  -->
+
+  <!-- ************************************************************************ -->
+  <!-- TWIST MUX -->
+  <!-- ************************************************************************ -->
+
+  <arg name="twist_mux_topics_locks_config_file" default="$(find-pkg-share r4c_simulation)/config/twist_mux_topics_locks.yaml"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/twist_mux.launch.py">
+    <arg name="config_file" value="$(var twist_mux_topics_locks_config_file)"/>
+    <arg name="cmd_vel_out" value="$(var twist_cmd_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- GROUND VEHICLE ODOMETRY BY TWIST -->
+  <!-- ************************************************************************ -->
+
+  <arg name="ground_vehicle_twist_odometry_param_file" default="$(find-pkg-share r4c_simulation)/config/tractor_twist_odometry.yaml"/>
+
+  <node pkg="eut_ground_vehicle_twist_odometry" exec="ground_vehicle_twist_odometry_node" name="ground_vehicle_twist_odometry" output="screen">
+    <param from="$(var ground_vehicle_twist_odometry_param_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- NAVIGATION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_navigation"              default="true"/>
+  <arg name="nav_config_file"             default="$(find-pkg-share r4c_navigation)/config/r4c_navigation_$(var large_scale_pilot).yaml"/>
+  <arg name="waypoints_file"              default="$(find-pkg-share r4c_navigation)/waypoints/waypoints_ab_lines_length_10m_radius_5m.csv"/>
+  <arg name="navigation_tree"             default="navigate_to_pose"/>
+  <arg name="navigation_tree_file"        default="$(find-pkg-share r4c_navigation)/behavior_trees/$(var navigation_tree).xml"/>
+
+  <include file="$(find-pkg-share r4c_simulation)/launch/r4c_navigation.launch.py" if="$(var use_navigation)">
+    <arg name="use_sim_time"             value="$(var simulation)"/> <!-- @todo: remove -->
+    <arg name="params_file"              value="$(var nav_config_file)"/>
+    <arg name="robot_base_frame"         value="$(var robot_base_frame)"/>
+    <arg name="odom_topic"               value="$(var wheel_odometry_topic)"/>
+    <arg name="waypoints_file"           value="$(var waypoints_file)"/>
+    <arg name="default_bt_xml_filename"  value="$(var navigation_tree_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- GLOBAL (FAKE) LOCALIZATION IN GAZEBO -->
+  <!-- ************************************************************************ -->
+
+  <arg name="fake_localization_config_file" default="$(find-pkg-share r4c_simulation)/config/fake_localization.yaml"/>
+
+  <include file="$(find-pkg-share eut_fake_localization)/launch/fake_localization.launch.xml">
+    <arg name="config_file" value="$(var fake_localization_config_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- TRUNK DETECTOR (USING 2D SCANS) -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_trunk_detector"         default="true"/>
+  <arg name="trunk_detector_config_file" default="$(find-pkg-share r4c_simulation)/config/trunk_detector.yaml"/>
+  <arg name="trunk_detector_topic"       default="trunk_detections"/>
+
+  <include file="$(find-pkg-share eut_laser_trunk_detector)/launch/laser2d_trunk_detector.launch.xml" if="$(var use_trunk_detector)">
+    <arg name="config_file"           value="$(var trunk_detector_config_file)"/>
+    <arg name="scan_topic"            value="/front_hokuyo/out"/>
+    <arg name="trunk_detection_topic" value="$(var trunk_detector_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- CROP ROW PATH ESTIMATOR -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_crop_row_estimator"               default="true"/>
+  <arg name="crop_row_estimator_name"              default="simple_crop_row_estimator"/>
+  <let name="crop_row_estimator_config_file"       value="$(find-pkg-share r4c_simulation)/config/crop_row_estimator.yaml"/>
+  <arg name="crop_row_estimator_global_plan_topic" default="/central_line"/>
+
+  <include file="$(find-pkg-share eut_crop_row_estimator)/launch/crop_row_estimator.launch.xml" if="$(var use_crop_row_estimator)">
+    <arg name="node_name"         value="$(var crop_row_estimator_name)"/>
+    <arg name="config_file"       value="$(var crop_row_estimator_config_file)"/>
+    <arg name="trunks_topic"      value="$(var trunk_detector_topic)"/>
+    <arg name="global_plan_topic" value="$(var crop_row_estimator_global_plan_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- ACKERMANN JOINT STATES TO TWIST -->
+  <!-- ************************************************************************ -->
+
+  <arg name="ackermann_joint_states_to_twist_config_file" default="$(find-pkg-share r4c_bringup)/config/ackermann_joint_states_to_twist.yaml"/>
+
+  <node pkg="ackermann_joint_states_utils" exec="ackermann_joint_states_to_twist_node" name="ackermann_joint_states_to_twist" output="screen">
+    <param from="$(var ackermann_joint_states_to_twist_config_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- CAN BUS COMM -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_can_bus_comm"                     default="false"/>
+  <arg name="can_dev"                              default="vcan0"/>
+  <arg name="can2ros_adapter_input_can_msg_topic"  default="can_msg_from_can_bus"/>
+  <arg name="ros2can_adapter_output_can_msg_topic" default="can_msg_to_can_bus"/>
+
+  <include if="$(var use_can_bus_comm)" file="$(find-pkg-share can_bus_comm)/launch/can_bus_bridge.xml">
+    <arg name="can_dev"                 value="$(var can_dev)"/>
+    <arg name="can_msg_topic_to_pub"    value="$(var can2ros_adapter_input_can_msg_topic)"/>
+    <arg name="can_msg_topic_to_sub"    value="$(var ros2can_adapter_output_can_msg_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- CAN ADAPTERS -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_can2ros_adapter"          default="false"/>
+  <arg name="use_ros2can_adapter"          default="false"/>
+  <arg name="r4c_can_adapters_params_file" default="$(find-pkg-share r4c_can_adapter)/config/can_adapters_tractor_$(var large_scale_pilot).yaml"/>
+
+  <node pkg="r4c_can_adapter" exec="tractor_can2ros_adapter_node" name="tractor_can2ros_adapter" output="screen" if="$(var use_can2ros_adapter)">
+    <param from="$(var r4c_can_adapters_params_file)"/>
+  </node>
+
+  <node pkg="r4c_can_adapter" exec="tractor_ros2can_adapter_node" name="tractor_ros2can_adapter" output="screen" if="$(var use_ros2can_adapter)">
+    <param from="$(var r4c_can_adapters_params_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- R4C COMMANDER -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_commander"         default="true"/>
+  <arg name="commander_config_file" default="$(find-pkg-share r4c_simulation)/config/commander_config.yaml"/>
+
+  <include file="$(find-pkg-share r4c_commander)/launch/r4c_commander.launch.xml" if="$(var use_commander)">
+    <arg name="r4c_commander_params_file" value="$(var commander_config_file)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- NAVSAT TRANSFORM -->
+  <!-- ************************************************************************ -->
+
+  <include file="$(find-pkg-share r4c_simulation)/launch/r4c_sim_navsat_transform.launch.py"/>
+
+  <!-- ************************************************************************ -->
+  <!-- NAVSATFIX PUBLISHER (GPS Simulation) -->
+  <!-- ************************************************************************ -->
+
+  <node pkg="r4c_simulation" exec="odom_to_ll.py" name="nav_feedback_publisher"/>
+
+  <!-- ************************************************************************ -->
+  <!-- R4C REPORTER (Fake Simulation) -->
+  <!-- ************************************************************************ -->
+
+  <node pkg="r4c_simulation" exec="fake_reporter.py" name="fake_reporter"/>
+
+  <!-- ************************************************************************ -->
+  <!-- FC WEB SERVER -->
+  <!-- ************************************************************************ -->
+
+  <!-- <include file="$(find-pkg-share r4c_bringup)/launch/r4c_web_server.launch.xml">
+    <arg name="large_scale_pilot"  value="sim"/>
+    <arg name="input_camera_topic" value="/camera1/image_raw"/>
+  </include> -->
+
+  <!-- ************************************************************************ -->
+  <!-- RVIZ -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rviz"         default="true"/>
+  <arg name="rviz_config_file" default="$(find-pkg-share r4c_simulation)/rviz/rviz_r4c.rviz"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/rviz.launch.xml" if="$(var use_rviz)">
+    <arg name="config_file" value="$(var rviz_config_file)"/>
+  </include>
+
+</launch>

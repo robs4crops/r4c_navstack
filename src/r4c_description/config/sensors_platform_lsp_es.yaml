@@ -1,0 +1,11 @@
+name: sensor_platform
+parent_frame: base_link
+base_frame: sensor_platform_link
+joint_parent_frame_base_frame:
+  name: sensor_platform_base_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 2.7
+  y: 0.0
+  z: 0.5

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- ************************************************************************ -->
+  <!-- RVIZ -->
+  <!-- ************************************************************************ -->
+
+  <arg name="config_file" default="$(find-pkg-share r4c_bringup)/rviz/r4c.rviz"/>
+
+  <node name="rviz2" pkg="rviz2" exec="rviz2" args="-d $(var config_file)"/>
+
+</launch>

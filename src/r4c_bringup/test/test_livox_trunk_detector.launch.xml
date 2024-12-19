@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- ************************************************************************ -->
+  <!-- LOCALIZATION -->
+  <!-- ************************************************************************ -->
+
+  <let name="slam_mode"   value="localization"/>
+  <let name="slam_sensor" value="avia"/>
+
+  <include file="$(find-pkg-share eut_fast_lio)/launch/mapping.launch.py">
+    <!--
+    This configuration file contain topics definition that must match some of those topics defined
+    right before including the launch file for the sensors.
+    -->
+    <arg name="config_path" value="$(find-pkg-share r4c_localization)/config/eut_fast_lio_$(var slam_sensor)_$(slam_mode).yaml"/>
+  </include>
+
+    <!-- ************************************************************************ -->
+    <!-- CLOUD ASSEMBLER -->
+    <!-- ************************************************************************ -->
+
+    <arg name="lidar_odometry_topic"                  default="Odometry"/>
+
+    <arg name="cloud_assembler_input_cloud_topic"     default="/cloud_registered"/> <!-- Published by eut_fast_lio -->
+    <arg name="cloud_assembler_assembled_cloud_topic" default="assembled_cloud"/>
+    <arg name="cloud_assembler_buffer_size"           default="10"/>
+    <arg name="cloud_assembler_use_circular_buffer"   default="true"/>
+
+    <include file="$(find-pkg-share eut_pcl_utils)/launch/cloud_assembler.launch.xml">
+      <arg name="odometry_topic"        value="$(var lidar_odometry_topic)"/>
+      <arg name="input_cloud_topic"     value="$(var cloud_assembler_input_cloud_topic)"/>
+      <arg name="assembled_cloud_topic" value="$(var cloud_assembler_assembled_cloud_topic)"/>
+      <arg name="buffer_size"           value="$(var cloud_assembler_buffer_size)"/>
+      <arg name="use_circular_buffer"   value="$(var cloud_assembler_use_circular_buffer)"/>
+    </include>
+
+    <!-- ************************************************************************ -->
+    <!-- TRUNK DETECTOR -->
+    <!-- ************************************************************************ -->
+
+    <arg name="trunk_detector_config_file" default="$(find-pkg-share r4c_bringup)/config/livox_trunk_detector.yaml"/>
+    <arg name="trunks_topic"               default="trunk_detections"/>
+
+    <include file="$(find-pkg-share eut_laser_trunk_detector)/launch/livox_trunk_detector.launch.xml">
+      <arg name="config_file"           value="$(var trunk_detector_config_file)"/>
+      <arg name="assembled_cloud_topic" value="$(var cloud_assembler_assembled_cloud_topic)"/>
+      <arg name="trunks_topic"          value="$(var trunks_topic)"/>
+    </include>
+
+    <!-- ************************************************************************ -->
+    <!-- CROP ROW PATH ESTIMATOR -->
+    <!-- ************************************************************************ -->
+
+    <arg name="crop_row_estimator_name"              default="livox_crop_row_estimator"/>
+    <arg name="crop_row_estimator_config_file"       default="$(find-pkg-share r4c_bringup)/config/livox_crop_row_estimator.yaml"/>
+    <arg name="crop_row_estimator_global_plan_topic" default="/central_line"/>
+
+    <include file="$(find-pkg-share eut_crop_row_estimator)/launch/crop_row_estimator.launch.xml">
+      <arg name="node_name"          value="$(var crop_row_estimator_name)"/>
+      <arg name="config_file"        value="$(var crop_row_estimator_config_file)"/>
+      <arg name="trunks_topic"       value="$(var trunks_topic)"/>
+      <arg name="global_plan_topic"  value="$(var crop_row_estimator_global_plan_topic)"/>
+    </include>
+
+</launch>

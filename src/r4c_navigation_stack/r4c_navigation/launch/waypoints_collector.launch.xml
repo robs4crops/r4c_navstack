@@ -1,0 +1,14 @@
+?xml version="1.0"?>
+
+<launch>
+  <arg name="odom_in_topic"    default="/odometry/global"/> <!-- In simulation: /r4c_tractor/wheel_odom -->
+
+  <!-- Path Navigation -->
+  <node pkg="r4c_navigation" exec="waypoint_collector_node" name="waypoint_collector" output="screen">
+    <param name="waypoint_distance" value="0.5"/>
+    <param name="covariance_treshold" value="5.0"/>
+    <param name="waypoints_directory" value="/home/eutrob/workspaces/ros2_ws/src/robs4crops/src/r4c_navigation_stack/r4c_navigation/waypoints"/>
+    <remap from="odom" to="$(var odom_in_topic)"/>
+  </node>
+
+</launch>

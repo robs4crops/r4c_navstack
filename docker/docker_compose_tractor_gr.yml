@@ -1,0 +1,79 @@
+# https://docs.docker.com/compose/environment-variables/#the-env-file
+version: "3"
+
+services:
+  robs4crops_humble:
+    image: robs4crops:humble
+    tty: true
+    stdin_open: true
+    network_mode: host
+    privileged: false
+    restart: always
+    command: ros2 launch r4c_bringup r4c_tractor_bringup_gr.launch.xml
+    volumes:
+      # +------------------+
+      # | Project mappings |
+      # +------------------+
+      - ~/workspaces/r4c_ws:/home/eutrob/workspace
+      - ./cyclonedds_config_tractor_gr.xml:/home/eutrob/.cyclonedds_config.xml
+      # +------------------+
+      # | Dataset mappings |
+      # +------------------+
+      - ~/datasets:/home/eutrob/datasets
+      # +-------------------+
+      # | Graphics mappings |
+      # +-------------------+
+      # This docker-compose file is meant to run in the robot, therefore no GUI support is required.
+      #- /tmp/.cookies.xauth:/tmp/.cookies.xauth:rw
+      #- /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # +------------------------+
+      # | Custom folder mappings |
+      # +------------------------+
+      - ~/.config/eut:/home/eutrob/.config/eut
+      - ~/.config/ros.org:/home/eutrob/.config/ros.org
+      - ~/.local/bin:/home/eutrob/.local/bin
+      # +----------------------+
+      # | Custom file mappings |
+      # +----------------------+
+    devices:
+      #- /dev/dri:/dev/dri:rw
+      - /dev/bus/usb:/dev/bus/usb:rw
+      # https://answers.ros.org/question/384456/ros2-joy_node-debugging/
+      - /dev/input/js0:/dev/input/js0:rw
+      - /dev/ttyUSB0:/dev/ttyUSB0:rw
+      #- /dev/ttyUSB1:/dev/ttyUSB1:rw
+      #- /dev/ttyACM0:/dev/ttyACM0:rw
+      #- /dev/ttyACM1:/dev/ttyACM1:rw
+    # device_cgroup_rules defines access control for specific hardware devices inside containers
+    # using Linux cgroups.
+    # This rule grants access to all USB devices by specifying the major device number 189, which is
+    # associated with USB.
+    # - c, specifies that we are dealing with a character device, which includes devices like USB
+    #   interfaces.
+    # - 189:*, refers to all USB devices (major number 189) with any minor number (*). This gives
+    #   the container access to all USB hardware plugged into the host, regardless of its specific
+    #   minor number.
+    # - "r", allows read access to the USB devices, enabling the container to receive data from USB.
+    # - "m", allows the creation of device nodes (mknod), which is essential for handling device
+    #    files inside the container.
+    # - "w", allows write access, so the container can send data to USB devices (e.g., control
+    #   commands).
+    # This configuration is commonly used in scenarios where the container needs to interface
+    # directly with USB hardware (sensors, actuators, or controllers are connected via USB,
+    # printers, donglesetc.)
+    # By applying this rule, the container can fully interact with USB devices on the host system,
+    # with permissions to read, write, and create device nodes as necessary for hardware
+    # interaction.
+    device_cgroup_rules:
+      - "c 189:* rmw"
+    environment:
+      #- DISPLAY=$DISPLAY
+      #- QT_X11_NO_MITSHM=1
+      #- XAUTHORITY=/tmp/.cookies.xauth
+      - ROS_DOMAIN_ID=0 # <<<<<<<<<< Needs to be this for FC LMS
+      - ROS_LOCALHOST_ONLY=0
+      - CYCLONEDDS_URI=file:///home/eutrob/.cyclonedds_config.xml
+      - RCUTILS_LOGGING_USE_STDOUT=1
+      - RCUTILS_LOGGING_BUFFERED_STREAM=1
+      - RCUTILS_COLORIZED_OUTPUT=1
+      - RCUTILS_CONSOLE_OUTPUT_FORMAT="[{name} {line_number}] [{time}] {message}"

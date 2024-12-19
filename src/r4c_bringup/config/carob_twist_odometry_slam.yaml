@@ -1,0 +1,8 @@
+ground_vehicle_twist_odometry:
+  ros__parameters:
+    odometry_frame: odom
+    robot_base_frame: base_footprint
+    first_twist_timeout: 240.0
+    publish_tf: false
+    odometry_topic: r4c_tractor/wheel_odom
+    twist_topic: r4c_tractor/vel

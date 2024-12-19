@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="input_cloud_topic"  default="/livox/lidar"/>
+  <arg name="output_cloud_topic" default="/livox/cloud"/>
+
+  <node pkg="eut_pcl_utils" exec="livox_repub_node" name="livox_repub_node" output="screen">
+    <remap from="/livox/lidar" to="$(var input_cloud_topic)"/>
+    <remap from="/livox_pcl0"  to="$(var output_cloud_topic)"/>
+  </node>
+
+</launch>

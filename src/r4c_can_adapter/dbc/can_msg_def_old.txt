@@ -1,0 +1,18 @@
+
+
+//  BO_ 529 ENSControl: 1 KUHN_M500
+//  SG_ MotionAuthorized : 0|1@1+ (1,0) [0|1] ""  AGC_ENS
+//  SG_ GoToAuto : 1|1@1+ (1,0) [0|1] ""  AGC_ENS
+//  SG_ SpeedLimitationENS : 2|1@1+ (1,0) [0|1] ""  AGC_ENS
+
+// BO_ 390 InverterLeftDrivingStatus: 8 INVERTER_LEFT
+// SG_ InverterLeftStatusWord : 0|16@1+ (1,0) [0|65535] "" EMBEDDED_CONTROLLER
+// SG_ InverterLeftVelocityRPM : 16|32@1- (1,0) [-2147483648|2147483647] "RPM"
+//                                                                         EMBEDDED_CONTROLLER
+// SG_ InverterLeftTorque : 48|16@1- (0.1,0) [-3276.8|3276.7] "% of peak" EMBEDDED_CONTROLLER
+
+// BO_ 391 InverterRightDrivingStatus: 8 INVERTER_RIGHT
+// SG_ InverterRightStatusWord : 0|16@1+ (1,0) [0|65535] "" EMBEDDED_CONTROLLER
+// SG_ InverterRightVelocityRPM : 16|32@1- (1,0) [-2147483648|2147483647] "RPM"
+//                                                                          EMBEDDED_CONTROLLER
+// SG_ InverterRightTorque : 48|16@1- (0.1,0) [-3276.8|3276.7] "% of peak"  EMBEDDED_CONTROLLER

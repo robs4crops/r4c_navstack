@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="agcbox" params="config_file">
+
+    <xacro:property name="conf_file" value="${config_file}"/>
+    <xacro:property name="config"    value="${xacro.load_yaml(conf_file)}"/>
+
+    <xacro:property name="mass"   value="${config['mass']}"/>
+    <xacro:property name="size_x" value="${config['size']['x']}"/>
+    <xacro:property name="size_y" value="${config['size']['y']}"/>
+    <xacro:property name="size_z" value="${config['size']['z']}"/>
+
+    <link name="${config['base_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_parent_frame_base_frame']['name']}" type="fixed">
+      <parent link="${config['parent_frame']}"/>
+      <child link="${config['base_frame']}"/>
+      <origin rpy="${config['joint_parent_frame_base_frame']['R']}
+      ${config['joint_parent_frame_base_frame']['P']}
+      ${config['joint_parent_frame_base_frame']['Y']}"
+      xyz="${config['joint_parent_frame_base_frame']['x']}
+      ${config['joint_parent_frame_base_frame']['y']}
+      ${config['joint_parent_frame_base_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['body_frame']}">
+      <visual>
+        <geometry>
+          <mesh filename="package://${config['mesh']['package']}/${config['mesh']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="${config['body_frame']}_color">
+            <color rgba="${config['color']['r']} ${config['color']['g']} ${config['color']['b']} ${config['color']['a']}"/>
+        </material>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${size_x} ${size_y} ${size_z}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </collision>
+      <inertial>
+        <mass value="${mass}"/>
+        <inertia ixx="${(1.0/12.0) * mass * (size_y * size_y + size_z * size_z)}"  ixy="0.0" ixz="0.0"
+                 iyy="${(1.0/12.0) * mass * (size_x * size_x + size_z * size_z)}" iyz="0.0"
+                 izz="${(1.0/12.0) * mass * (size_x * size_x + size_y * size_y)}" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_base_frame_body_frame']['name']}" type="fixed">
+      <parent link="${config['base_frame']}"/>
+      <child link="${config['body_frame']}"/>
+      <origin rpy="${config['joint_base_frame_body_frame']['R']}
+      ${config['joint_base_frame_body_frame']['P']}
+      ${config['joint_base_frame_body_frame']['Y']}"
+      xyz="${config['joint_base_frame_body_frame']['x']}
+      ${config['joint_base_frame_body_frame']['y']}
+      ${config['joint_base_frame_body_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['imu_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <link name="${config['gnss_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_body_frame_imu_frame']['name']}" type="fixed">
+      <parent link="${config['body_frame']}"/>
+      <child link="${config['imu_frame']}"/>
+      <origin rpy="${config['joint_body_frame_imu_frame']['R']}
+      ${config['joint_body_frame_imu_frame']['P']}
+      ${config['joint_body_frame_imu_frame']['Y']}"
+      xyz="${config['joint_body_frame_imu_frame']['x']}
+      ${config['joint_body_frame_imu_frame']['y']}
+      ${config['joint_body_frame_imu_frame']['z']}"/>
+    </joint>
+
+    <joint name="${config['joint_body_frame_gnss_frame']['name']}" type="fixed">
+      <parent link="${config['body_frame']}"/>
+      <child link="${config['gnss_frame']}"/>
+      <origin rpy="${config['joint_body_frame_gnss_frame']['R']}
+      ${config['joint_body_frame_gnss_frame']['P']}
+      ${config['joint_body_frame_gnss_frame']['Y']}"
+      xyz="${config['joint_body_frame_gnss_frame']['x']}
+      ${config['joint_body_frame_gnss_frame']['y']}
+      ${config['joint_body_frame_gnss_frame']['z']}"/>
+    </joint>
+
+  </xacro:macro>
+
+</robot>

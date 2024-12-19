@@ -1,0 +1,319 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="tractor_nh" params="config_file">
+
+    <xacro:property name="conf_file" value="${config_file}"/>
+    <xacro:property name="config"    value="${xacro.load_yaml(conf_file)}"/>
+
+    <xacro:macro name="null_inertial">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01"/>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="solid_cuboid_inertia" params="mass size_x size_y size_z">
+      <inertial>
+	      <mass value="${mass}"/>
+	      <inertia ixx="${(1.0/12.0) * mass * (size_y * size_y + size_z * size_z)}" ixy="0.0" ixz="0.0"
+                 iyy="${(1.0/12.0) * mass * (size_x * size_x + size_z * size_z)}" iyz="0.0"
+                 izz="${(1.0/12.0) * mass * (size_x * size_x + size_y * size_y)}"/>
+      </inertial>
+    </xacro:macro>
+
+    <xacro:macro name="solid_cylinder_inertia" params="mass radius length">
+      <inertial>
+        <mass value="${mass}"/>
+        <inertia ixx="${(1.0/12.0) * mass * (3.0 * radius * radius + length * length)}" ixy="0.0" ixz="0.0"
+                 iyy="${(1.0/2.0) * mass * radius * radius}"                            iyz="0.0"
+                 izz="${(1.0/12.0) * mass * (3.0 * radius * radius + length * length)}"/>
+      </inertial>
+    </xacro:macro>
+
+    <!-- RVIZ MATERIAL COLOUR -->
+
+    <material name="darkgrey">
+      <color rgba="0.0 0.0 0.0 0.7"/>
+    </material>
+
+    <!-- ROBOT DEFINITION -->
+
+    <link name="${config['footprint_frame']}"/>
+
+    <link name="${config['base_frame']}">
+      <visual>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://${config['meshes']['chassis']['package']}/${config['meshes']['chassis']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="${config['name']}_color">
+            <color rgba="${config['color']['r']} ${config['color']['g']} ${config['color']['b']} ${config['color']['a']}"/>
+        </material>
+      </visual>
+      <collision>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://${config['meshes']['chassis']['package']}/${config['meshes']['chassis']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+      </collision>
+      <xacro:solid_cuboid_inertia mass="${config['mass']}" size_x="${config['size']['x']}" size_y="${config['size']['y']}" size_z="${config['size']['z']}"/>
+    </link>
+
+    <joint name = "${config['joint_footprint_frame_base_frame']['name']}" type = "fixed">
+      <parent link="${config['footprint_frame']}"/>
+      <child link="${config['base_frame']}"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 ${config['rear_wheel_radius']}"/>
+    </joint>
+
+    <!-- FRONT LEFT SIDE -->
+
+    <link name="${config['left_steering_frame']}">
+      <xacro:null_inertial/>
+    </link>
+
+    <joint name="${config['joint_base_frame_left_steering_frame']['name']}" type="revolute">
+      <parent link="${config['base_frame']}"/>
+      <child link="${config['left_steering_frame']}"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${config['wheelbase']} ${config['front_wheel_spacing']/2.0} ${config['wheelbase_height']}"/>
+      <axis xyz="0 0 1"/>
+      <dynamics damping="0.01" friction="1.0"/>
+      <limit effort="2000.0" lower="${-config['max_steering_angle']}" upper="${config['max_steering_angle']}" velocity="100.0"/>
+    </joint>
+
+    <link name="${config['front_left_wheel_frame']}">
+      <visual>
+        <geometry>
+          <mesh filename="package://${config['meshes']['front_wheel']['package']}/${config['meshes']['front_wheel']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <material name="darkgrey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="${config['front_wheel_radius']}" length="${config['front_wheel_width']}"/>
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      </collision>
+      <xacro:solid_cylinder_inertia mass="${config['front_wheel_mass']}" radius="${config['front_wheel_radius']}" length="${config['front_wheel_width']}"/>
+    </link>
+
+    <joint name="${config['joint_left_steering_frame_front_left_wheel_frame']['name']}" type="continuous">
+      <parent link="${config['left_steering_frame']}"/>
+      <child link="${config['front_left_wheel_frame']}"/>
+      <origin rpy="-1.5708 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <!-- FRONT RIGHT SIDE -->
+
+    <link name="${config['right_steering_frame']}">
+      <xacro:null_inertial/>
+    </link>
+
+    <joint name="${config['joint_base_frame_right_steering_frame']['name']}" type="revolute">
+      <parent link="${config['base_frame']}"/>
+      <child link="${config['right_steering_frame']}"/>
+      <origin rpy="0.0 0.0 0.0" xyz="${config['wheelbase']} ${-config['front_wheel_spacing']/2.0} ${config['wheelbase_height']}"/>
+      <axis xyz="0 0 1"/>
+      <dynamics damping="0.01" friction="1.0"/>
+      <limit effort="2000.0" lower="${-config['max_steering_angle']}" upper="${config['max_steering_angle']}" velocity="100.0"/>
+    </joint>
+
+    <link name="${config['front_right_wheel_frame']}">
+      <visual>
+        <geometry>
+          <mesh filename="package://${config['meshes']['front_wheel']['package']}/${config['meshes']['front_wheel']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <material name="darkgrey"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="${config['front_wheel_radius']}" length="${config['front_wheel_width']}"/>
+        </geometry>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      </collision>
+      <xacro:solid_cylinder_inertia mass="${config['front_wheel_mass']}" radius="${config['front_wheel_radius']}" length="${config['front_wheel_width']}"/>
+    </link>
+
+    <joint name="${config['joint_right_steering_frame_front_right_wheel_frame']['name']}" type="continuous">
+      <parent link="${config['right_steering_frame']}"/>
+      <child link="${config['front_right_wheel_frame']}"/>
+      <origin rpy="1.5708 0.0 0.0" xyz="0.0 0.0 0.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <!-- REAR LEFT SIDE -->
+
+    <link name="${config['rear_left_wheel_frame']}">
+      <visual>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://${config['meshes']['rear_wheel']['package']}/${config['meshes']['rear_wheel']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="darkgrey"/>
+      </visual>
+      <collision>
+        <origin rpy="1.5708 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <cylinder radius="${config['rear_wheel_radius']}" length="${config['rear_wheel_width']}"/>
+        </geometry>
+      </collision>
+      <xacro:solid_cylinder_inertia mass="${config['rear_wheel_mass']}" radius="${config['rear_wheel_radius']}" length="${config['rear_wheel_width']}"/>
+    </link>
+
+    <joint name="${config['joint_base_frame_rear_left_wheel_frame']['name']}" type="continuous">
+      <parent link="${config['base_frame']}"/>
+      <child link="${config['rear_left_wheel_frame']}"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 ${config['rear_wheel_spacing']/2.0} 0.0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <!-- REAR RIGHT SIDE -->
+
+    <link name="${config['rear_right_wheel_frame']}">
+      <visual>
+        <origin rpy="0.0 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://${config['meshes']['rear_wheel']['package']}/${config['meshes']['rear_wheel']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="darkgrey"/>
+      </visual>
+      <collision>
+        <origin rpy="1.5708 0.0 0.0" xyz="0.0 0.0 0.0"/>
+        <geometry>
+          <cylinder radius="${config['rear_wheel_radius']}" length="${config['rear_wheel_width']}"/>
+        </geometry>
+      </collision>
+      <xacro:solid_cylinder_inertia mass="${config['rear_wheel_mass']}" radius="${config['rear_wheel_radius']}" length="${config['rear_wheel_width']}"/>
+    </link>
+
+    <joint name="${config['joint_base_frame_rear_right_wheel_frame']['name']}" type="continuous">
+      <parent link="${config['base_frame']}"/>
+      <child link="${config['rear_right_wheel_frame']}"/>
+      <origin rpy="0.0 0.0 0.0" xyz="0.0 ${-config['rear_wheel_spacing']/2.0} 0.0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+
+    <!-- GAZEBO PLUGIN  -->
+
+    <gazebo>
+      <plugin filename="libgazebo_ros_ackermann_drive.so" name="${config['name']}_gzb_ros_ackermann_drive_plugin">
+        <ros>
+          <namespace>${config['plugins']['ackermann']['ns']}</namespace>
+          <remapping>cmd_vel:=${config['plugins']['ackermann']['cmd_vel_topic']}</remapping>
+          <remapping>odom:=${config['plugins']['ackermann']['odom_topic']}</remapping>
+          <remapping>distance:=${config['plugins']['ackermann']['distance_topic']}</remapping>
+        </ros>
+
+        <update_rate>${config['plugins']['ackermann']['update_rate']}</update_rate>
+
+        <!-- wheels -->
+        <front_left_joint>${config['joint_left_steering_frame_front_left_wheel_frame']['name']}</front_left_joint>
+        <front_right_joint>${config['joint_right_steering_frame_front_right_wheel_frame']['name']}</front_right_joint>
+        <rear_left_joint>${config['joint_base_frame_rear_left_wheel_frame']['name']}</rear_left_joint>
+        <rear_right_joint>${config['joint_base_frame_rear_right_wheel_frame']['name']}</rear_right_joint>
+        <left_steering_joint>${config['joint_base_frame_left_steering_frame']['name']}</left_steering_joint>
+        <right_steering_joint>${config['joint_base_frame_right_steering_frame']['name']}</right_steering_joint>
+
+        <!-- Max absolute steer angle for tyre in radians-->
+        <!-- Any cmd_vel angular z greater than this would be capped -->
+        <max_steer>${config['plugins']['ackermann']['max_steer']}</max_steer>
+
+        <!-- Max absolute steering angle of steering wheel -->
+        <!-- Max absolute steering angle of steering wheel -->
+        <max_steering_angle>${config['plugins']['ackermann']['max_steering_angle']}</max_steering_angle> <!-- Not important. Limit set by joints-->
+
+        <!-- Max absolute linear speed in m/s -->
+        <max_speed>${config['plugins']['ackermann']['max_speed']}</max_speed>
+
+        <!-- PID tuning -->
+        <left_steering_pid_gain>
+          ${config['plugins']['ackermann']['left_steering_control']['p']}
+          ${config['plugins']['ackermann']['left_steering_control']['i']}
+          ${config['plugins']['ackermann']['left_steering_control']['d']}
+        </left_steering_pid_gain>
+
+        <left_steering_i_range>
+          ${config['plugins']['ackermann']['left_steering_control']['i_range']['value1']}
+          ${config['plugins']['ackermann']['left_steering_control']['i_range']['value2']}
+        </left_steering_i_range>
+
+        <right_steering_pid_gain>
+          ${config['plugins']['ackermann']['right_steering_control']['p']}
+          ${config['plugins']['ackermann']['right_steering_control']['i']}
+          ${config['plugins']['ackermann']['right_steering_control']['d']}
+        </right_steering_pid_gain>
+
+        <right_steering_i_range>
+          ${config['plugins']['ackermann']['right_steering_control']['i_range']['value1']}
+          ${config['plugins']['ackermann']['right_steering_control']['i_range']['value2']}
+        </right_steering_i_range>
+
+        <linear_velocity_pid_gain>
+          ${config['plugins']['ackermann']['linear_velocity_control']['p']}
+          ${config['plugins']['ackermann']['linear_velocity_control']['i']}
+          ${config['plugins']['ackermann']['linear_velocity_control']['d']}
+        </linear_velocity_pid_gain>
+
+        <linear_velocity_i_range>
+          ${config['plugins']['ackermann']['linear_velocity_control']['i_range']['value1']}
+          ${config['plugins']['ackermann']['linear_velocity_control']['i_range']['value2']}
+        </linear_velocity_i_range>
+
+        <!-- output -->
+        <publish_odom>${config['plugins']['ackermann']['publish_odom']}</publish_odom>
+        <publish_odom_tf>${config['plugins']['ackermann']['publish_odom_tf']}</publish_odom_tf>
+        <publish_wheel_tf>${config['plugins']['ackermann']['publish_wheel_tf']}</publish_wheel_tf>
+        <publish_distance>${config['plugins']['ackermann']['publish_distance']}</publish_distance>
+
+        <odometry_frame>${config['plugins']['ackermann']['odometry_frame']}</odometry_frame>
+        <robot_base_frame>${config['plugins']['ackermann']['robot_base_frame']}</robot_base_frame>
+
+      </plugin>
+
+      <plugin filename="libgazebo_ros_joint_state_publisher.so" name="${config['name']}_gzb_ros_joint_state_publisher_plugin">
+        <ros>
+          <!-- Remap the default topic -->
+          <remapping>joint_states:=${config['plugins']['joint_state_publisher']['joint_state_topic']}</remapping>
+        </ros>
+
+        <!-- Update rate in Hertz -->
+        <update_rate>${config['plugins']['joint_state_publisher']['update_rate']}</update_rate>
+
+        <!-- Name of joints in the model whose states will be published. -->
+        <joint_name>${config['joint_base_frame_left_steering_frame']['name']}</joint_name>
+        <joint_name>${config['joint_base_frame_right_steering_frame']['name']}</joint_name>
+        <joint_name>${config['joint_left_steering_frame_front_left_wheel_frame']['name']}</joint_name>
+        <joint_name>${config['joint_right_steering_frame_front_right_wheel_frame']['name']}</joint_name>
+        <joint_name>${config['joint_base_frame_rear_left_wheel_frame']['name']}</joint_name>
+        <joint_name>${config['joint_base_frame_rear_right_wheel_frame']['name']}</joint_name>
+      </plugin>
+
+      <plugin filename="libgazebo_ros_p3d.so" name="${config['name']}_gzb_ros_p3d_plugin">
+
+        <ros>
+          <remapping>odom:=${config['plugins']['p3d']['base_ground_truth_topic']}</remapping>
+        </ros>
+
+        <always_on>${config['plugins']['p3d']['always_on']}</always_on>
+        <update_rate>${config['plugins']['p3d']['update_rate']}</update_rate>
+        <frame_name>${config['plugins']['p3d']['frame_name']}</frame_name>
+        <body_name>${config['plugins']['p3d']['body_name']}</body_name>
+        <rpy_offset>
+          ${config['plugins']['p3d']['offsets']['R']}
+          ${config['plugins']['p3d']['offsets']['P']}
+          ${config['plugins']['p3d']['offsets']['Y']}
+        </rpy_offset>
+        <xyz_offset>
+          ${config['plugins']['p3d']['offsets']['x']}
+          ${config['plugins']['p3d']['offsets']['y']}
+          ${config['plugins']['p3d']['offsets']['z']}
+        </xyz_offset>
+        <gaussian_noise>${config['plugins']['p3d']['gaussian_noise']}</gaussian_noise>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,302 @@
+#!/bin/bash
+
+script_name="$(basename "${BASH_SOURCE[0]}")"
+# script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+
+# Print in the terminal how to use this script.
+usage() {
+  echo "Usage: ${script_name} <options>"
+  echo
+  echo "Options"
+  echo
+  echo "  -h                - Show this message."
+  echo "  -d datasets_path  - The path where datasets are stored."
+  echo "  -a                - Record all topics available."
+  echo "  -i                - Comma-separated list of topics to ignore when recording"
+  echo "  -p                - Log node parameters"
+  echo "  -t                - Comma-separated list of topics to record"
+  echo
+  echo "Only one flag from -a, -i, -t can be provided"
+
+  exit 155
+}
+
+# /////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
+
+# Retrieve all the topics available in the ROS DOMAIN where this script runs.
+all_topics() {
+  # ros2 topic list return a column list, i.e., each topic appears in a different line.
+  # List all the topics in a single line, separated by a single space.
+  echo "$(ros2 topic list | tr '\n' ' ')"
+}
+
+# /////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
+
+# Retrieve all the topics available in the ROS DOMAIN where this script runs, ignoring the topics
+# passed
+ignore_topics() {
+
+  local topics_to_ignore="${1}"
+
+  # ros2 topic list return a column list, i.e., each topic appears in a different line.
+  # List all the topics in a single line, separated by a single space.
+  local topics_to_record="$(all_topics)"
+
+  # If there are no topics to ignore, then record all available topics.
+  [ -z "${topics_to_ignore}" ] && echo "${topics_to_record}" && return 0
+
+  # Create an array from the topics the user wants to ignore, so we can iterate through the array
+  # within a for loop.
+  IFS=',' read -r -a topics_to_ignore_array <<<"${topics_to_ignore}"
+
+  # Remove the topics the user is not interesting in from the list of all available topics.
+  # for ((i = 0; i < ${#topics_to_ignore_array[@]}; i++)); do
+  for topic_to_ignore in ${topics_to_ignore_array[@]}; do
+    # The // replaces all occurences of the substring ${topic} with the content between / and },
+    # i.e., in this case nothing.
+    topics_to_record="${topics_to_record//${topic_to_ignore}/}"
+  done
+
+  # Trim leading and trailing space or tab characters and also squeeze sequences of tabs and spaces
+  # into a single space. That works because when you assign something to one of the fields, awk
+  # rebuilds the whole record (as printed by print) by joining all fields ($1, ..., $NF) with
+  # OFS (space by default).
+  # Ref: https://unix.stackexchange.com/questions/102008/how-do-i-trim-leading-and-trailing-whitespace-from-each-line-of-some-output
+  echo "$(echo "${topics_to_record}" | awk '{$1=$1;print}')"
+}
+
+# /////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
+
+log_experiment_into_logbook() {
+
+  local logbook="${1}"
+
+  [ -z "${logbook}" ] && echo ">> Logbook not provided" && return 1
+
+  echo ">> Registering experiment in logbook $(basename ${logbook})"
+
+  echo -n ">> Briefly description of the experiment: "
+  read description
+
+  echo -n ">> Main parameter changes: "
+  read parameters
+
+  echo -n ">> Result: "
+  read result
+
+  echo "${today_utc}${time_utc};${description};${parameters};${result}" >>"${logbook}"
+}
+
+# /////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
+
+log_discarded_experiment_into_logbook() {
+
+  local logbook="${1}"
+
+  [ -z "${logbook}" ] && echo ">> Logbook not provided" && return 1
+
+  echo ">> Registering discarded experiment in logbook $(basename ${logbook})"
+
+  echo "${today_utc}${time_utc};Experiment discarded;none;none" >>"${logbook}"
+}
+
+# /////////////////////////////////////////////////////////////////////////////
+# /////////////////////////////////////////////////////////////////////////////
+
+dump_parameters() {
+
+  local output_parameter_file="${1}"
+
+  # Create an array of available nodes, and dump the parameters of each node to an output file.
+  local node_array=($(ros2 node list | tr '\n' ' '))
+
+  [ "${#node_array}" -eq 0 ] && echo ">> No nodes found" && return 0
+
+  echo ">> Found ${#node_array[@]} nodes"
+
+  [ -z "${output_parameter_file}" ] && echo ">> No ouput file provided to dump parameters" && return 1
+
+  [ ! -e "${output_parameter_file}" ] &&
+    echo ">> Creating output parameter file $(basename "${output_parameter_file}")" &&
+    touch "${output_parameter_file}"
+
+  # Variable to visualize in terminal which node is being processed.
+  local i=1
+
+  # 2>/dev/null is used in commands 'ros2 param dump ...' and 'ros2 param list ...' to avoid
+  # a first line in the output that says:
+  # <secs>.<nanosecs> [0]  ros2: using network interface xxxx (udp/W.X.Y.Z) selected arbitrarily from: bla, blabla
+
+  for node in "${node_array[@]}"; do
+    params="$(ros2 param list "${node}" 2>/dev/null | wc -l)"
+
+    if [ "${params}" -gt 0 ]; then
+      ros2 param dump --print "${node}" 2>/dev/null >>"${output_parameter_file}"
+      # echo '' >>"${output_parameter_file}" # add a new line among parameters of different nodes.
+      # The value of i occupies 3 places, justified to the left.
+      printf '>> %-3s %s: %s parameters dumped\n' "${i}" "${node}" "${params}"
+    else
+      # The value of i occupies 3 places, justified to the left.
+      printf '>> %-3s %s: No parameters dumped\n' "${i}" "${node}"
+    fi
+
+    ((i++))
+  done
+}
+
+# -------------------------------------
+
+# Datasets path initializated with a default value.
+datasets_path="${HOME}/datasets"
+
+# Recording modes available:
+#  * all (-a): record all available topics.
+#  * explicit (-t): record only the topics listed by the user in the command line.
+#  * ignore (-i): record all available topics except those listed by the user in the command line.
+recording_mode=""
+
+# List of topics, separated with a space, that will be recorded in the bagfile.
+topics_to_record=""
+
+# Flag to indicate if node parameters must be logged.
+dump_parameters_to_file="false"
+
+# Use UTC dates.
+# Specially when working in international projects, different partners from different countries work
+# together, and it is very likely that some of them has different timezones configured in their
+# computers, so it is convenient to use a common reference time, so later we can figure out
+# time issues if they happen.
+today_utc="$(date --utc '+%Y-%m-%d')"
+# Working with ISO time values: https://www.techtarget.com/whatis/definition/ISO-date-format
+# A time value is typically preceded by the T designator. The T can be omitted if there is no risk
+# of confusing the time with the date.
+# The Z designator indicates that the time zone is UTC and needs only to be tagged onto the time
+# value.
+time_utc="T$(date --utc '+%H%M%S')Z"
+
+# Process input from user
+while getopts 'ad:hi:pt:' option; do
+  case "${option}" in
+  a)
+    # Check if other recording mode has been found earlier.
+    if [ "${recording_mode}" = "ignore" ] || [ "${recording_mode}" = "explicit" ]; then
+      usage
+    fi
+
+    recording_mode="all"
+    topics_to_record="$(all_topics)"
+    ;;
+  d)
+    datasets_path="${OPTARG}"
+    ;;
+  h)
+    usage
+    ;;
+  i)
+    # Check if other recording mode has been found earlier.
+    if [ "${recording_mode}" = "all" ] || [ "${recording_mode}" = "explicit" ]; then
+      usage
+    fi
+
+    recording_mode="ignore"
+    echo ">> Topics to ignore: $(echo ${OPTARG} | tr ',' ' ')"
+    topics_to_record="$(ignore_topics "${OPTARG}")"
+    ;;
+  p)
+    dump_parameters_to_file="true"
+    ;;
+  t)
+    # Check if other recording mode has been found earlier.
+    if [ "${recording_mode}" = "all" ] || [ "${recording_mode}" = "ignore" ]; then
+      usage
+    fi
+
+    recording_mode="explicit"
+    # transform comma-separated list of topics into space-separated list of topics.
+    topics_to_record="$(echo "${OPTARG}" | tr ',' ' ')"
+    ;;
+  ?)
+    usage
+    ;;
+  esac
+done
+
+[ ! -e "${datasets_path}" ] && echo ">> Datasets path '${datasets_path}' not found" && exit 1
+
+today_datasets_path="${datasets_path}/${today_utc}"
+logbook="${today_datasets_path}/${today_utc}.csv"
+bagfile_path="${today_datasets_path}/${today_utc}${time_utc}"
+
+if [ ! -e "${today_datasets_path}" ]; then
+  echo ">> Creating folder $(basename ${today_datasets_path}) ..."
+  mkdir -p "${today_datasets_path}"
+
+  echo ">> Creating logbook $(basename ${logbook}) ..."
+  echo "Date (UTC);Description;Parameters;Result" >${logbook}
+fi
+
+# If the user does not indicate the recording mode, we assume "all", i.e., record all available
+# topics.
+[ -z "${recording_mode}" ] && recording_mode="all" && topics_to_record="$(all_topics)"
+
+echo ">> Topics to record: ${topics_to_record}"
+
+# It is better to dump first the nodes' parameters in a file and next run the 'ros2 bag record'
+# command, because the usual way to stop the recording is by pressing Ctrl-C in ther terminal, so by
+# the time the user hits this keychord, it is very very likely that the action the user wants at
+# that very moment is to stop the script, not to wait for the parameters to be dumped, which by the
+# way it is a bit annoying in ros2, since it takes a significant amount of time.
+# There is a caveat with this approach of logging first the nodes' parameters and next record the
+# topics. We cannot create the path ${bagfile}, to dump the node's parameters in a file located at
+# that path, and then pass that path to the 'ros2 bag record' command so it can create the bagfile
+# in there. It won't work, the 'ros2 bag record' command will complain that the path alredy exists.
+# So, the solution is to dump the nodes' parameters in a file located in another path, for example
+# /tmp, and after the 'ros2 bag record' command has finished, move the dumped parameter file to the
+# ${bagfile_path}.
+if [ "${dump_parameters_to_file}" = "true" ]; then
+  parameter_file="${today_utc}${time_utc}.params.yaml"
+  dump_parameters "/tmp/${parameter_file}"
+fi
+
+# No commas around ${topics_to_record}, otherwise it will be interpreted as a one sigle string,
+# not a list of topics,and the command will not work.
+# 2>/dev/null is used in commands 'ros2 param dump ...' and 'ros2 param list ...' to avoid
+# a first line in the output that says:
+# <secs>.<nanosecs> [0]  ros2: using network interface xxxx (udp/W.X.Y.Z) selected arbitrarily from: bla, blabla
+echo ">> Recording bagfile..."
+ros2 bag record --output "${bagfile_path}" ${topics_to_record} 2>/dev/null
+
+echo ''
+echo ">> Finished recording the bagfile"
+
+[ "${dump_parameters_to_file}" = "true" ] && [ -e "/tmp/${parameter_file}" ] &&
+  mv "/tmp/${parameter_file}" "${bagfile_path}/${parameter_file}"
+
+# If the user does not want to keep the recorded bagfile, the answer 'n' (or N, or no or NO or No)
+# must be provided. Then, we ask again if the user is really sure the bagfile must be deleted, and
+# the answer 'y' (or derivatives) must bre provided.
+# By asking a questions that requires to answer no (or derivatives) and then asking again another
+# question that requires to answer 'yes' (or derivatives), we require the user to read and
+# understand what it has been asked, to avoid that automatic enter enter enter answer that we
+# nowadays do often when a text is prompted, without reading carefully.
+
+echo -n ">> Keep recorded bagfile? [y/n]: "
+read keep
+
+if [ "${keep}" = "n" ] || [ "${keep}" = "N" ] || [ "${keep}" = "no" ] || [ "${keep}" = "NO" ] || [ "${keep}" = "No" ]; then
+  echo -n ">> Are you sure you want to delete the bagfile ? [y/n]: "
+  read delete
+
+  if [ "${delete}" = "y" ] || [ "${delete}" = "Y" ] || [ "${delete}" = "yes" ] || [ "${delete}" = "YES" ] || [ "${delete}" = "Yes" ]; then
+    rm -rfv "${bagfile_path}"
+    log_discarded_experiment_into_logbook "${logbook}"
+  else
+    log_experiment_into_logbook "${logbook}"
+  fi
+else
+  log_experiment_into_logbook "${logbook}"
+fi

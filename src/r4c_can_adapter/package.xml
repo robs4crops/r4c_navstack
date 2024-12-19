@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>r4c_can_adapter</name>
+  <version>2.0.0</version>
+  <description>
+    An adapter is a pice of software that receives data in one format, 'adapts it' (translates it)
+    into another format and publishes it.
+  </description>
+  <maintainer email="juan.rascon@eurecat.org">juan.rascon</maintainer>
+  <maintainer email="pau.reverte@eurecat.org">pau.reverte</maintainer>
+  <license>TODO: License declaration</license>
+  <url type="repository">https://ice.eurecat.org/gitlab/robotics-automation/robs4crops</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <build_depend>yaml-cpp</build_depend>
+  <exec_depend>yaml-cpp</exec_depend>
+
+  <build_depend>rclcpp</build_depend>
+  <exec_depend>rclcpp</exec_depend>
+
+  <build_depend>rclcpp_components</build_depend>
+  <exec_depend>rclcpp_components</exec_depend>
+
+  <build_depend>rclcpp_lifecycle</build_depend>
+  <exec_depend>rclcpp_lifecycle</exec_depend>
+
+  <build_depend>angles</build_depend>
+  <exec_depend>angles</exec_depend>
+
+  <build_depend>can_msgs</build_depend>
+  <exec_depend>can_msgs</exec_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+  <exec_depend>ros2launch</exec_depend>
+
+  <build_depend>sensor_msgs</build_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+
+  <build_depend>std_msgs</build_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <build_depend>std_srvs</build_depend>
+  <exec_depend>std_srvs</exec_depend>
+
+  <build_depend>tf2</build_depend>
+  <exec_depend>tf2</exec_depend>
+
+  <build_depend>tf2_geometry_msgs</build_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+
+  <build_depend>r4c_msgs</build_depend>
+  <exec_depend>r4c_msgs</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,520 @@
+VERSION ""
+
+
+NS_ :
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: KALMAN_STATE AGC_ENS EUT_NOBU RECEIVE AGC_SPE TECU SPRAYER GPS INVERTER_LEFT INVERTER_RIGHT
+
+BO_ 0 CanopenNmt: 2 EUT_NOBU
+ SG_ CanopenChangeState : 0|8@1+ (1,0) [0|255] ""  AGC_ENS
+ SG_ NodeId : 8|8@1+ (1,0) [0|255] ""  AGC_ENS
+
+BO_ 529 EnsControl: 1 EUT_NOBU
+ SG_ MotionAuthorized : 0|1@1+ (1,0) [0|1] ""  AGC_ENS
+ SG_ GoToAuto : 1|1@1+ (1,0) [0|1] ""  AGC_ENS
+ SG_ VelocityLimitationEns : 2|1@1+ (1,0) [0|1] ""  AGC_ENS
+
+BO_ 657 EnsSteeringCommands: 5 EUT_NOBU
+ SG_ GuidanceLeftSpeed : 0|16@1- (1,0) [-32768|32767] "mm/s" Vector__XXX
+ SG_ GuidanceRightSpeed : 16|16@1- (1,0) [-32768|32767] "mm/s" Vector__XXX
+ SG_ SafetyCounterENS : 32|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 390 InverterLeftDrivingStatus: 8 INVERTER_LEFT
+ SG_ InverterLeftStatusWord : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ InverterLeftVelocityRPM : 16|32@1- (1,0) [-2147483648|2147483647] "RPM" Vector__XXX
+ SG_ InverterLeftTorque : 48|16@1- (0.1,0) [-32768|32767] "percent of peak" Vector__XXX
+
+BO_ 391 InverterRightDrivingStatus: 8 INVERTER_RIGHT
+ SG_ InverterRightStatusWord : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ InverterRightVelocityRPM : 16|32@1- (1,0) [-2147483648|2147483647] "RPM" Vector__XXX
+ SG_ InverterRightTorque : 48|16@1- (0.1,0) [-32768|32767] "percent of peak" Vector__XXX
+
+BO_ 914 StatePsi: 8 KALMAN_STATE
+ SG_ StateTickTime : 0|32@1+ (1,0) [0|4294967295] "ms" EUT_NOBU
+ SG_ Psi : 32|32@1- (1E-006,0) [-2147.483648|2147.483647] "rad" EUT_NOBU
+
+BO_ 1809 HeartbeatEns: 1 AGC_ENS
+ SG_ CanopenStatusEns : 0|8@1+ (1,0) [0|255] ""  EUT_NOBU
+
+BO_ 401 EnsStatus: 3 AGC_ENS
+ SG_ RequestMotion : 0|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ GeofencingKO : 1|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ StatusWordEns : 8|8@1+ (1,0) [0|255] ""  EUT_NOBU
+ SG_ MissionWidth : 16|8@1+ (0.1,0) [0|25.5] "m"  EUT_NOBU
+
+BO_ 527 ImuAngularZ: 8 AGC_SPE
+ SG_ ImuTimestamp : 0|31@1+ (0.001,0) [0|4294967.295] "s"  EUT_NOBU
+ SG_ ImuAngleZ : 32|16@1- (0.0001,0) [-3.2768|3.2767] "rad"  EUT_NOBU
+ SG_ ImuAngularVelocityZ : 48|16@1- (0.0001,0) [-3.2768|3.2767] "rad/s"  EUT_NOBU
+
+BO_ 1423 ImuAngularY: 8 AGC_SPE
+ SG_ ImuTimestamp : 0|31@1+ (0.001,0) [0|4294967.295] "s"  EUT_NOBU
+ SG_ ImuAngleY : 32|16@1- (0.0001,0) [-3.2768|3.2767] "rad"  EUT_NOBU
+ SG_ ImuAngularVelocityY : 48|16@1- (0.0001,0) [-3.2768|3.2767] "rad/s"  EUT_NOBU
+
+BO_ 1167 ImuAngularX: 8 AGC_SPE
+ SG_ ImuTimestamp : 0|31@1+ (0.001,0) [0|4294967.295] "s"  EUT_NOBU
+ SG_ ImuAngleX : 32|16@1- (0.0001,0) [-3.2768|3.2767] "rad"  EUT_NOBU
+ SG_ ImuAngularVelocityX : 48|16@1- (0.0001,0) [-3.2768|3.2767] "rad/s"  EUT_NOBU
+
+BO_ 1295 ImuLinearZ: 8 AGC_SPE
+ SG_ ImuTimestamp : 0|31@1+ (0.001,0) [0|4294967.295] "s"  EUT_NOBU
+ SG_ ImuDVZ : 32|16@1- (0.001,0) [-32.768|32.767] "m/s"  EUT_NOBU
+ SG_ ImuAccelerationZ : 48|16@1- (0.001,0) [-32.768|32.767] "m/s2"  EUT_NOBU
+
+BO_ 1039 ImuLinearY: 8 AGC_SPE
+ SG_ ImuTimestamp : 0|31@1+ (0.001,0) [0|4294967.295] "s"  EUT_NOBU
+ SG_ ImuDVY : 32|16@1- (0.001,0) [-32.768|32.767] "m/s"  EUT_NOBU
+ SG_ ImuAccelerationY : 48|16@1- (0.001,0) [-32.768|32.767] "m/s2"  EUT_NOBU
+
+BO_ 783 ImuLinearX: 8 AGC_SPE
+ SG_ ImuTimestamp : 0|31@1+ (0.001,0) [0|4294967.295] "s"  EUT_NOBU
+ SG_ ImuDVX : 32|16@1- (0.001,0) [-32.768|32.767] "m/s"  EUT_NOBU
+ SG_ ImuAccelerationX : 48|16@1- (0.001,0) [-32.768|32.767] "m/s2"  EUT_NOBU
+
+BO_ 1679 GnssVelocityNorth: 6 AGC_SPE
+ SG_ GnssValidityFlag : 0|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ GnssTimestamp : 1|31@1+ (0.001,0) [0|2147483.647] "s"  EUT_NOBU
+ SG_ GnssVelocityNorth : 32|16@1- (0.001,0) [-32.768|32.767] "m/s"  EUT_NOBU
+
+BO_ 1551 GnssVelocityEast: 6 AGC_SPE
+ SG_ GnssValidityFlag : 0|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ GnssTimestamp : 1|31@1+ (0.001,0) [0|2147483.647] "s"  EUT_NOBU
+ SG_ GnssVelocityEast : 32|16@1- (0.001,0) [-32.768|32.767] "m/s"  EUT_NOBU
+
+BO_ 911 GnssPositionUp: 8 AGC_SPE
+ SG_ GnssValidityFlag : 0|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ GnssTimestamp : 1|31@1+ (0.001,0) [0|2147483.647] "s"  EUT_NOBU
+ SG_ GnssPositionUp : 32|32@1- (0.001,0) [-2147483.648|2147483.647] "m"  EUT_NOBU
+
+BO_ 655 GnssPositionNorth: 8 AGC_SPE
+ SG_ GnssValidityFlag : 0|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ GnssTimestamp : 1|31@1+ (0.001,0) [0|2147483.647] "s"  EUT_NOBU
+ SG_ GnssPositionNorth : 32|32@1- (0.001,0) [-2147483.648|2147483.647] "m"  EUT_NOBU
+
+BO_ 399 GnssPositionEast: 8 AGC_SPE
+ SG_ GnssValidityFlag : 0|1@1+ (1,0) [0|1] ""  EUT_NOBU
+ SG_ GnssTimestamp : 1|31@1+ (0.001,0) [0|2147483.647] "s"  EUT_NOBU
+ SG_ GnssPositionEast : 32|32@1- (0.001,0) [-2147483.648|2147483.647] "m"  EUT_NOBU
+
+BO_ 1807 HeartbeatSpe: 1 AGC_SPE
+ SG_ CanopenStatusSpe : 0|8@1+ (1,0) [0|255] ""  EUT_NOBU
+
+BO_ 2365475312 GbsdTecu: 8 TECU
+ SG_ Speed : 0|16@1+ (0.001,0) [0|64.255] "m/s"  SPRAYER
+ SG_ Distance : 16|32@1+ (0.001,0) [0|4211080] "m"  SPRAYER
+ SG_ Direction : 56|2@1+ (1,0) [0|3] ""  SPRAYER
+
+BO_ 2314731804 GnssWgs84: 8 GPS
+ SG_ Latitude : 0|32@1- (1E-007,0) [-90|90] "deg" Vector__XXX
+ SG_ Longitude : 32|32@1- (1E-007,0) [-180|180] "deg" Vector__XXX
+
+BO_ 2583168284 GnssPosData: 8 GPS
+ SG_ NumberOfSVs : 0|8@1+ (1,0) [0|252] "" Vector__XXX
+ SG_ HDOP : 8|16@1- (0.01,0) [-327.64|327.64] "" Vector__XXX
+ SG_ PDOP : 24|16@1- (0.01,0) [-327.64|327.64] "" Vector__XXX
+ SG_ NumberOfReferenceStations : 40|8@1+ (1,0) [0|252] "" Vector__XXX
+ SG_ ReferenceStationID1 : 48|12@1+ (1,0) [0|4095] "" Vector__XXX
+ SG_ GnssMethod : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+
+BO_ 2314732060 CogSog: 8 GPS
+ SG_ SID : 0|8@1+ (1,0) [0|252] "" Vector__XXX
+ SG_ CogReference : 8|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ CourseOverGround : 16|16@1+ (0.0001,0) [0|6.2831] "rad" Vector__XXX
+ SG_ SpeedOverGround : 32|16@1+ (0.01,0) [0|655.32] "m/s" Vector__XXX
+
+CM_ BU_ EUT_NOBU "Eurecat's navigation on-board unit. Master on the bus";
+CM_ BU_ AGC_SPE "For now, this node is embedded on ENS. Therefore it is not yet managed through NMT nor heartbeat";
+CM_ BU_ TECU "Tractor ECU";
+CM_ BU_ SPRAYER "Sprayer Implement";
+CM_ BU_ GPS "GPS Receiver";
+CM_ SG_ 401 RequestMotion "Boolean to ask auto-motion control of the robot to the master of the bus. True if the user requested a mission start";
+CM_ SG_ 529 MotionAuthorized "Boolean to authorize ENS to automatically drive the robot";
+CM_ SG_ 529 GoToAuto "Boolean to allow ENS to switch to autonomous mode, if its own conditions are satisfied. True only if the user requested a switch of the robot to autonomous mode";
+CM_ SG_ 529 VelocityLimitationEns "If true, then the velocity limitation is active";
+CM_ SG_ 1679 GnssTimestamp "Time of Week since Saturday 00:00 (GPS time, don't forget leap seconds to convert tu UTC time)";
+CM_ SG_ 1551 GnssTimestamp "Time of Week since Saturday 00:00 (GPS time, don't forget leap seconds to convert tu UTC time)";
+CM_ SG_ 911 GnssTimestamp "Time of Week since Saturday 00:00 (GPS time, don't forget leap seconds to convert tu UTC time)";
+CM_ SG_ 655 GnssTimestamp "Time of Week since Saturday 00:00 (GPS time, don't forget leap seconds to convert tu UTC time)";
+CM_ SG_ 399 GnssTimestamp "Time of Week since Saturday 00:00 (GPS time, don't forget leap seconds to convert tu UTC time)";
+CM_ BO_ 2365475312 "Ground-based speed and distance";
+CM_ BO_ 2583168284 "This PGN conveys a comprehensive set of Global Navigation Satellite System (GNSS) parameters, including position information";
+CM_ SG_ 2583168284 NumberOfSVs "Numeric count, event counter, sequence counter";
+CM_ SG_ 2583168284 HDOP "Dilution of Precision (DOP) indicates the contribution of satellite configuration geometry to positioning error";
+CM_ SG_ 2583168284 PDOP "Dilution of Precision (DOP) indicates the contribution of satellite configuration geometry to positioning error";
+CM_ SG_ 2583168284 NumberOfReferenceStations "Numeric count, event counter, sequence counter";
+CM_ SG_ 2583168284 ReferenceStationID1 "Reference Station ID";
+CM_ BO_ 2314732060 "This PGN is a single frame PGN that provides Course Over Ground (COG) and Speed Over Ground (SOG). Being a single frame msg, as opposed to other PGNs that include COG and sOG and are defined as multi-packet, this PGN lends itself to being transmitted more f";
+CM_ SG_ 2314732060 SID "An upward counting number used to tie related information together between different PGNs. For example, SID would be used to tie together COG, SOG and RAIM values to a given Pos. 255=no valid Pos fix to tie it to. Range 0 to 250 for valid Pos fixes.";
+CM_ SG_ 2314732060 CogReference "0 = True, 1 = Magnetic, 2 = Error, 3 = Null";
+CM_ SG_ 2314732060 CourseOverGround "The direction of the path over ground actually followed by a vessel.";
+BA_DEF_ SG_  "GenSigStartValue" INT -2147483648 2147483647;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ BO_  "GenMsgFastOnStart" INT 0 100000;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 3600000;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 1000000;
+BA_DEF_ BU_  "ISO11783PDDVersion" ENUM  "0","1","2","3";
+BA_DEF_ BU_  "ISO11783PDDFilename" STRING ;
+BA_DEF_ BU_  "ISO11783IOPVersion" ENUM  "0","1","2","3","4";
+BA_DEF_ BU_  "ISO11783IOPFilename" STRING ;
+BA_DEF_  "ISO11783_13_SpecVersion" STRING ;
+BA_DEF_ BU_  "GnssPosData_TypeOfSystem" INT 0 4;
+BA_DEF_ BU_  "GnssPosData_SequenceID" INT 0 252;
+BA_DEF_ BU_  "GnssPosData_ReferenceStationType" INT 0 15;
+BA_DEF_ BU_  "GnssPosData_ReferenceStationID2" INT 0 65535;
+BA_DEF_ BU_  "GnssPosData_ReferenceStationID1" INT 0 65535;
+BA_DEF_ BU_  "GnssPosData_PDOP" FLOAT -327.64 327.64;
+BA_DEF_ BU_  "GnssPosData_NumberOfSVs" INT 0 252;
+BA_DEF_ BU_  "GnssPosData_NumberOfReferenceSta" INT 0 252;
+BA_DEF_ BU_  "GnssPosData_MethodGnss" INT 0 15;
+BA_DEF_ BU_  "GnssPosData_HDOP" FLOAT -327.64 327.64;
+BA_DEF_ BU_  "GnssPosData_GeodialSeparation" FLOAT -21470000 21470000;
+BA_DEF_ BU_  "GnssPosData_GnssIntegrity" INT 0 3;
+BA_DEF_ BU_  "GnssPosData_AgeOfDGnssRefStat2" FLOAT 0 655.32;
+BA_DEF_ BU_  "GnssPosData_AgeOfDGnssRefStat1" FLOAT 0 655.32;
+BA_DEF_  "ISO11783_12_SpecVersion" STRING ;
+BA_DEF_ SG_  "SigType" ENUM  "Default","Range","RangeSigned","ASCII","Discrete","Control","ReferencePGN","DTC","StringDelimiter","StringLength","StringLengthControl";
+BA_DEF_  "DatabaseVersion" STRING ;
+BA_DEF_ SG_  "SPN" INT 0 524287;
+BA_DEF_ BO_  "GenMsgRequestable" INT 0 1;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 3600000;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "cyclic","reserved","cyclicIfActive","reserved","reserved","reserved","reserved","reserved","noMsgSendType","vector_leerstring";
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG","vector_leerstring";
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "NmJ1939IdentityNumber" INT 0 2097151;
+BA_DEF_ BU_  "NmJ1939ManufacturerCode" INT 0 2047;
+BA_DEF_ BU_  "NmJ1939ECUInstance" INT 0 7;
+BA_DEF_ BU_  "NmJ1939FunctionInstance" INT 0 7;
+BA_DEF_ BU_  "NmJ1939Function" INT 0 255;
+BA_DEF_ BU_  "NmJ1939SystemInstance" INT 0 15;
+BA_DEF_ BU_  "NmJ1939System" INT 0 127;
+BA_DEF_ BU_  "NmJ1939IndustryGroup" INT 0 7;
+BA_DEF_ BU_  "NmJ1939AAC" INT 0 1;
+BA_DEF_ BU_  "NmStationAddress" INT 0 255;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "ProtocolType" STRING ;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BO_  "SingleFrame" INT 0 1;
+BA_DEF_ SG_  "DDI" INT 0 65535;
+BA_DEF_  "ISO11783_6_SpecVersion" STRING ;
+BA_DEF_  "ISO11783_7_SpecVersion" STRING ;
+BA_DEF_  "ISO11783_11_SpecVersion" STRING ;
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "NoSigSendType";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenMsgFastOnStart" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "ISO11783PDDVersion" "3";
+BA_DEF_DEF_  "ISO11783PDDFilename" "";
+BA_DEF_DEF_  "ISO11783IOPVersion" "3";
+BA_DEF_DEF_  "ISO11783IOPFilename" "";
+BA_DEF_DEF_  "ISO11783_13_SpecVersion" "";
+BA_DEF_DEF_  "GnssPosData_TypeOfSystem" 0;
+BA_DEF_DEF_  "GnssPosData_SequenceID" 0;
+BA_DEF_DEF_  "GnssPosData_ReferenceStationType" 0;
+BA_DEF_DEF_  "GnssPosData_ReferenceStationID2" 0;
+BA_DEF_DEF_  "GnssPosData_ReferenceStationID1" 0;
+BA_DEF_DEF_  "GnssPosData_PDOP" 0;
+BA_DEF_DEF_  "GnssPosData_NumberOfSVs" 0;
+BA_DEF_DEF_  "GnssPosData_NumberOfReferenceSta" 0;
+BA_DEF_DEF_  "GnssPosData_MethodGnss" 0;
+BA_DEF_DEF_  "GnssPosData_HDOP" 0;
+BA_DEF_DEF_  "GnssPosData_GeodialSeparation" 0;
+BA_DEF_DEF_  "GnssPosData_GnssIntegrity" 0;
+BA_DEF_DEF_  "GnssPosData_AgeOfDGnssRefStat2" 0;
+BA_DEF_DEF_  "GnssPosData_AgeOfDGnssRefStat1" 0;
+BA_DEF_DEF_  "ISO11783_12_SpecVersion" "";
+BA_DEF_DEF_  "SigType" "Default";
+BA_DEF_DEF_  "DatabaseVersion" "";
+BA_DEF_DEF_  "SPN" 0;
+BA_DEF_DEF_  "GenMsgRequestable" 1;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgSendType" "noMsgSendType";
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "NmJ1939IdentityNumber" 0;
+BA_DEF_DEF_  "NmJ1939ManufacturerCode" 0;
+BA_DEF_DEF_  "NmJ1939ECUInstance" 0;
+BA_DEF_DEF_  "NmJ1939FunctionInstance" 0;
+BA_DEF_DEF_  "NmJ1939Function" 0;
+BA_DEF_DEF_  "NmJ1939SystemInstance" 0;
+BA_DEF_DEF_  "NmJ1939System" 0;
+BA_DEF_DEF_  "NmJ1939IndustryGroup" 0;
+BA_DEF_DEF_  "NmJ1939AAC" 0;
+BA_DEF_DEF_  "NmStationAddress" 254;
+BA_DEF_DEF_  "BusType" "";
+BA_DEF_DEF_  "ProtocolType" "";
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "SingleFrame" 1;
+BA_DEF_DEF_  "DDI" 0;
+BA_DEF_DEF_  "ISO11783_6_SpecVersion" "";
+BA_DEF_DEF_  "ISO11783_7_SpecVersion" "";
+BA_DEF_DEF_  "ISO11783_11_SpecVersion" "";
+BA_ "BusType" "CAN";
+BA_ "ISO11783_11_SpecVersion" "2007-01-15 DIS";
+BA_ "ISO11783_7_SpecVersion" "2007-03-17 DIS";
+BA_ "ISO11783_6_SpecVersion" "2007-02-26 DIS";
+BA_ "ProtocolType" "ISO11783";
+BA_ "DatabaseVersion" "4.1";
+BA_ "ISO11783_12_SpecVersion" "2006-10-24 DIS";
+BA_ "NmStationAddress" BU_ KALMAN_STATE 18;
+BA_ "NmStationAddress" BU_ AGC_ENS 17;
+BA_ "NmStationAddress" BU_ EUT_NOBU 1;
+BA_ "ISO11783IOPVersion" BU_ RECEIVE 4;
+BA_ "NmStationAddress" BU_ RECEIVE 21;
+BA_ "NmStationAddress" BU_ AGC_SPE 15;
+BA_ "NodeLayerModules" BU_ TECU "ISO11783_IL.vmodule";
+BA_ "NmStationAddress" BU_ TECU 240;
+BA_ "NmJ1939AAC" BU_ TECU 0;
+BA_ "NmJ1939IndustryGroup" BU_ TECU 2;
+BA_ "NmJ1939System" BU_ TECU 0;
+BA_ "NmJ1939SystemInstance" BU_ TECU 0;
+BA_ "NmJ1939Function" BU_ TECU 134;
+BA_ "NmJ1939FunctionInstance" BU_ TECU 0;
+BA_ "NmJ1939ECUInstance" BU_ TECU 0;
+BA_ "NmJ1939ManufacturerCode" BU_ TECU 1861;
+BA_ "NmJ1939IdentityNumber" BU_ TECU 701224;
+BA_ "ECU" BU_ TECU "TECU";
+BA_ "NodeLayerModules" BU_ SPRAYER "ISO11783_IL.vmodule";
+BA_ "NmStationAddress" BU_ SPRAYER 128;
+BA_ "NmJ1939AAC" BU_ SPRAYER 1;
+BA_ "NmJ1939IndustryGroup" BU_ SPRAYER 2;
+BA_ "NmJ1939System" BU_ SPRAYER 6;
+BA_ "NmJ1939SystemInstance" BU_ SPRAYER 0;
+BA_ "NmJ1939Function" BU_ SPRAYER 132;
+BA_ "NmJ1939FunctionInstance" BU_ SPRAYER 0;
+BA_ "NmJ1939ECUInstance" BU_ SPRAYER 0;
+BA_ "NmJ1939ManufacturerCode" BU_ SPRAYER 1861;
+BA_ "NmJ1939IdentityNumber" BU_ SPRAYER 702222;
+BA_ "ECU" BU_ SPRAYER "SPRAYER";
+BA_ "NodeLayerModules" BU_ GPS "GNSS_NL.vmodule";
+BA_ "NmStationAddress" BU_ GPS 28;
+BA_ "NmJ1939AAC" BU_ GPS 1;
+BA_ "NmJ1939IndustryGroup" BU_ GPS 2;
+BA_ "NmJ1939System" BU_ GPS 0;
+BA_ "NmJ1939SystemInstance" BU_ GPS 0;
+BA_ "NmJ1939Function" BU_ GPS 23;
+BA_ "NmJ1939FunctionInstance" BU_ GPS 0;
+BA_ "NmJ1939ECUInstance" BU_ GPS 0;
+BA_ "NmJ1939ManufacturerCode" BU_ GPS 1861;
+BA_ "NmJ1939IdentityNumber" BU_ GPS 701221;
+BA_ "ECU" BU_ GPS "GPS";
+BA_ "NmStationAddress" BU_ INVERTER_LEFT 6;
+BA_ "NmStationAddress" BU_ INVERTER_RIGHT 7;
+BA_ "VFrameFormat" BO_ 1809 0;
+BA_ "GenMsgSendType" BO_ 1809 0;
+BA_ "GenMsgCycleTime" BO_ 1809 500;
+BA_ "VFrameFormat" BO_ 0 0;
+BA_ "GenMsgSendType" BO_ 0 2;
+BA_ "VFrameFormat" BO_ 401 0;
+BA_ "GenMsgSendType" BO_ 401 0;
+BA_ "GenMsgCycleTime" BO_ 401 50;
+BA_ "VFrameFormat" BO_ 529 0;
+BA_ "GenMsgSendType" BO_ 529 0;
+BA_ "GenMsgCycleTime" BO_ 529 50;
+BA_ "VFrameFormat" BO_ 657 0;
+BA_ "GenMsgSendType" BO_ 657 0;
+BA_ "GenMsgCycleTime" BO_ 657 20;
+BA_ "SingleFrame" BO_ 527 1;
+BA_ "VFrameFormat" BO_ 527 0;
+BA_ "GenMsgSendType" BO_ 527 0;
+BA_ "GenMsgCycleTime" BO_ 527 20;
+BA_ "SingleFrame" BO_ 1423 1;
+BA_ "VFrameFormat" BO_ 1423 0;
+BA_ "GenMsgSendType" BO_ 1423 0;
+BA_ "GenMsgCycleTime" BO_ 1423 20;
+BA_ "SingleFrame" BO_ 1167 1;
+BA_ "VFrameFormat" BO_ 1167 0;
+BA_ "GenMsgSendType" BO_ 1167 0;
+BA_ "GenMsgCycleTime" BO_ 1167 20;
+BA_ "SingleFrame" BO_ 1295 1;
+BA_ "VFrameFormat" BO_ 1295 0;
+BA_ "GenMsgSendType" BO_ 1295 0;
+BA_ "GenMsgCycleTime" BO_ 1295 20;
+BA_ "SingleFrame" BO_ 1039 1;
+BA_ "VFrameFormat" BO_ 1039 0;
+BA_ "GenMsgSendType" BO_ 1039 0;
+BA_ "GenMsgCycleTime" BO_ 1039 20;
+BA_ "SingleFrame" BO_ 783 1;
+BA_ "VFrameFormat" BO_ 783 0;
+BA_ "GenMsgSendType" BO_ 783 0;
+BA_ "GenMsgCycleTime" BO_ 783 20;
+BA_ "GenMsgSendType" BO_ 914 0;
+BA_ "GenMsgCycleTime" BO_ 914 20;
+BA_ "SingleFrame" BO_ 1679 1;
+BA_ "VFrameFormat" BO_ 1679 0;
+BA_ "GenMsgSendType" BO_ 1679 0;
+BA_ "GenMsgCycleTime" BO_ 1679 200;
+BA_ "SingleFrame" BO_ 1551 1;
+BA_ "VFrameFormat" BO_ 1551 0;
+BA_ "GenMsgSendType" BO_ 1551 0;
+BA_ "GenMsgCycleTime" BO_ 1551 200;
+BA_ "SingleFrame" BO_ 911 1;
+BA_ "VFrameFormat" BO_ 911 0;
+BA_ "GenMsgSendType" BO_ 911 0;
+BA_ "GenMsgCycleTime" BO_ 911 200;
+BA_ "SingleFrame" BO_ 655 1;
+BA_ "VFrameFormat" BO_ 655 0;
+BA_ "GenMsgSendType" BO_ 655 0;
+BA_ "GenMsgCycleTime" BO_ 655 200;
+BA_ "SingleFrame" BO_ 399 1;
+BA_ "VFrameFormat" BO_ 399 0;
+BA_ "GenMsgSendType" BO_ 399 0;
+BA_ "GenMsgCycleTime" BO_ 399 200;
+BA_ "GenMsgCycleTime" BO_ 1807 500;
+BA_ "VFrameFormat" BO_ 1807 0;
+BA_ "GenMsgCycleTime" BO_ 2365475312 100;
+BA_ "GenMsgSendType" BO_ 2365475312 8.53594844804822E-317;
+BA_ "VFrameFormat" BO_ 2365475312 3;
+BA_ "VFrameFormat" BO_ 2314731804 3;
+BA_ "GenMsgCycleTime" BO_ 2583168284 100;
+BA_ "GenMsgSendType" BO_ 2583168284 8.52390115134002E-317;
+BA_ "SingleFrame" BO_ 2583168284 0;
+BA_ "VFrameFormat" BO_ 2583168284 3;
+BA_ "GenMsgRequestable" BO_ 2314732060 1;
+BA_ "SingleFrame" BO_ 2314732060 1;
+BA_ "GenMsgCycleTime" BO_ 2314732060 250;
+BA_ "VFrameFormat" BO_ 2314732060 3;
+BA_ "GenSigInactiveValue" SG_ 1809 CanopenStatusEns 500;
+BA_ "GenSigSendType" SG_ 1809 CanopenStatusEns 0;
+BA_ "GenSigSendType" SG_ 0 CanopenChangeState 1;
+BA_ "GenSigSendType" SG_ 0 NodeId 1;
+BA_ "GenSigInactiveValue" SG_ 914 Psi 20;
+BA_ "GenSigInactiveValue" SG_ 914 StateTickTime 20;
+BA_ "GenSigInactiveValue" SG_ 401 RequestMotion 50;
+BA_ "GenSigSendType" SG_ 401 RequestMotion 0;
+BA_ "GenSigInactiveValue" SG_ 401 GeofencingKO 50;
+BA_ "GenSigSendType" SG_ 401 GeofencingKO 0;
+BA_ "GenSigInactiveValue" SG_ 401 StatusWordEns 50;
+BA_ "GenSigSendType" SG_ 401 StatusWordEns 0;
+BA_ "GenSigInactiveValue" SG_ 401 MissionWidth 50;
+BA_ "GenSigSendType" SG_ 401 MissionWidth 0;
+BA_ "GenSigInactiveValue" SG_ 529 MotionAuthorized 50;
+BA_ "GenSigSendType" SG_ 529 MotionAuthorized 0;
+BA_ "GenSigInactiveValue" SG_ 529 GoToAuto 50;
+BA_ "GenSigSendType" SG_ 529 GoToAuto 0;
+BA_ "GenSigInactiveValue" SG_ 529 VelocityLimitationEns 50;
+BA_ "GenSigSendType" SG_ 529 VelocityLimitationEns 0;
+BA_ "GenSigInactiveValue" SG_ 527 ImuTimestamp 20;
+BA_ "GenSigSendType" SG_ 527 ImuTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 527 ImuAngleZ 20;
+BA_ "GenSigSendType" SG_ 527 ImuAngleZ 0;
+BA_ "GenSigInactiveValue" SG_ 527 ImuAngularVelocityZ 20;
+BA_ "GenSigSendType" SG_ 527 ImuAngularVelocityZ 0;
+BA_ "GenSigInactiveValue" SG_ 1423 ImuTimestamp 20;
+BA_ "GenSigSendType" SG_ 1423 ImuTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 1423 ImuAngleY 20;
+BA_ "GenSigSendType" SG_ 1423 ImuAngleY 0;
+BA_ "GenSigInactiveValue" SG_ 1423 ImuAngularVelocityY 20;
+BA_ "GenSigSendType" SG_ 1423 ImuAngularVelocityY 0;
+BA_ "GenSigInactiveValue" SG_ 1167 ImuTimestamp 20;
+BA_ "GenSigSendType" SG_ 1167 ImuTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 1167 ImuAngleX 20;
+BA_ "GenSigSendType" SG_ 1167 ImuAngleX 0;
+BA_ "GenSigInactiveValue" SG_ 1167 ImuAngularVelocityX 20;
+BA_ "GenSigSendType" SG_ 1167 ImuAngularVelocityX 0;
+BA_ "GenSigInactiveValue" SG_ 1295 ImuTimestamp 20;
+BA_ "GenSigSendType" SG_ 1295 ImuTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 1295 ImuDVZ 20;
+BA_ "GenSigSendType" SG_ 1295 ImuDVZ 0;
+BA_ "GenSigInactiveValue" SG_ 1295 ImuAccelerationZ 20;
+BA_ "GenSigSendType" SG_ 1295 ImuAccelerationZ 0;
+BA_ "GenSigInactiveValue" SG_ 1039 ImuTimestamp 20;
+BA_ "GenSigSendType" SG_ 1039 ImuTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 1039 ImuDVY 20;
+BA_ "GenSigSendType" SG_ 1039 ImuDVY 0;
+BA_ "GenSigInactiveValue" SG_ 1039 ImuAccelerationY 20;
+BA_ "GenSigSendType" SG_ 1039 ImuAccelerationY 0;
+BA_ "GenSigInactiveValue" SG_ 783 ImuTimestamp 20;
+BA_ "GenSigSendType" SG_ 783 ImuTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 783 ImuDVX 20;
+BA_ "GenSigSendType" SG_ 783 ImuDVX 0;
+BA_ "GenSigInactiveValue" SG_ 783 ImuAccelerationX 20;
+BA_ "GenSigSendType" SG_ 783 ImuAccelerationX 0;
+BA_ "GenSigInactiveValue" SG_ 1679 GnssValidityFlag 200;
+BA_ "GenSigSendType" SG_ 1679 GnssValidityFlag 0;
+BA_ "GenSigInactiveValue" SG_ 1679 GnssTimestamp 200;
+BA_ "GenSigSendType" SG_ 1679 GnssTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 1679 GnssVelocityNorth 200;
+BA_ "GenSigSendType" SG_ 1679 GnssVelocityNorth 0;
+BA_ "GenSigInactiveValue" SG_ 1551 GnssValidityFlag 200;
+BA_ "GenSigSendType" SG_ 1551 GnssValidityFlag 0;
+BA_ "GenSigInactiveValue" SG_ 1551 GnssTimestamp 200;
+BA_ "GenSigSendType" SG_ 1551 GnssTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 1551 GnssVelocityEast 200;
+BA_ "GenSigSendType" SG_ 1551 GnssVelocityEast 0;
+BA_ "GenSigInactiveValue" SG_ 911 GnssValidityFlag 200;
+BA_ "GenSigSendType" SG_ 911 GnssValidityFlag 0;
+BA_ "GenSigInactiveValue" SG_ 911 GnssTimestamp 200;
+BA_ "GenSigSendType" SG_ 911 GnssTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 911 GnssPositionUp 200;
+BA_ "GenSigSendType" SG_ 911 GnssPositionUp 0;
+BA_ "GenSigInactiveValue" SG_ 655 GnssValidityFlag 200;
+BA_ "GenSigSendType" SG_ 655 GnssValidityFlag 0;
+BA_ "GenSigInactiveValue" SG_ 655 GnssTimestamp 200;
+BA_ "GenSigSendType" SG_ 655 GnssTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 655 GnssPositionNorth 200;
+BA_ "GenSigSendType" SG_ 655 GnssPositionNorth 0;
+BA_ "GenSigInactiveValue" SG_ 399 GnssValidityFlag 200;
+BA_ "GenSigSendType" SG_ 399 GnssValidityFlag 0;
+BA_ "GenSigInactiveValue" SG_ 399 GnssTimestamp 200;
+BA_ "GenSigSendType" SG_ 399 GnssTimestamp 0;
+BA_ "GenSigInactiveValue" SG_ 399 GnssPositionEast 200;
+BA_ "GenSigSendType" SG_ 399 GnssPositionEast 0;
+BA_ "GenSigInactiveValue" SG_ 1807 CanopenStatusSpe 500;
+BA_ "GenSigSendType" SG_ 1807 CanopenStatusSpe 0;
+BA_ "GenSigInactiveValue" SG_ 529 MotionAuthorized 50;
+BA_ "GenSigInactiveValue" SG_ 529 GoToAuto 50;
+BA_ "GenSigInactiveValue" SG_ 529 SpeedLimitationENS 50;
+BA_ "SigType" SG_ 2365475312 Speed 1;
+BA_ "SigType" SG_ 2365475312 Distance 1;
+BA_ "SigType" SG_ 2365475312 Direction 4;
+BA_ "SigType" SG_ 2583168284 NumberOfSVs 1;
+BA_ "SigType" SG_ 2583168284 HDOP 2;
+BA_ "SigType" SG_ 2583168284 PDOP 2;
+BA_ "SigType" SG_ 2583168284 NumberOfReferenceStations 1;
+BA_ "SigType" SG_ 2583168284 ReferenceStationID1 1;
+BA_ "SigType" SG_ 2314732060 SID 1;
+BA_ "SigType" SG_ 2314732060 CogReference 4;
+BA_ "SigType" SG_ 2314732060 CourseOverGround 1;
+BA_ "SigType" SG_ 2314732060 SpeedOverGround 1;
+VAL_ 1809 CanopenStatusEns 127 "Pre-operational" 5 "Operational" 4 "Stopped" 0 "Boot up" ;
+VAL_ 0 CanopenChangeState 130 "Reset communication" 129 "Reset sensor" 128 "Go to Pre-operational" 2 "Go to stopped" 1 "Go to operational" ;
+VAL_ 401 StatusWordEns 3 "Auto-frozen" 2 "Auto-motion" 1 "Auto-standby" 4 "Safe" 0 "Standby" ;
+VAL_ 1807 CanopenStatusSpe 127 "Pre-operational" 5 "Operational" 4 "Stopped" 0 "Boot up" ;
+VAL_ 2583168284 GnssMethod 14 "Error" 8 "Simulate mode" 7 "Manual input" 6 "Estimated DR mode" 5 "RTK float" 4 "RTK fixed integer" 3 "Precise GNSS" 2 "DGNSS fix" 1 "GNSS fix" 0 "No GPS" ;
+VAL_ 2314732060 SID 255 "nVldPsFxTTItTRng0T250FrVldPstnFx" ;
+VAL_ 2314732060 CogReference 0 "True" 1 "Magnetic" 2 "Error" 3 "Null" ;
+

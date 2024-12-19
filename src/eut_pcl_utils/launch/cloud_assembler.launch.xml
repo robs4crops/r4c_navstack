@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="input_cloud_topic"     default="cloud_registered"/>
+  <arg name="odometry_topic"        default="Odometry"/>
+  <arg name="assembled_cloud_topic" default="assembled_cloud"/>
+  <arg name="buffer_size"           default="10"/>
+
+  <arg name="use_circular_buffer"   default="true"/>
+
+  <node unless="$(var use_circular_buffer)" pkg="eut_pcl_utils" exec="registered_cloud_assembler_node" name="cloud_assembler" output="screen">
+    <param name="buffer_size"             value="$(var buffer_size)"/>
+    <remap from="cloud_registered"        to="$(var input_cloud_topic)"/>
+    <remap from="Odometry"                to="$(var odometry_topic)"/>
+    <remap from="assembled_cloud"         to="$(var assembled_cloud_topic)"/>
+  </node>
+
+  <node if="$(var use_circular_buffer)" pkg="eut_pcl_utils" exec="cloud_circular_assembler_node" name="cloud_assembler" output="screen">
+    <param name="buffer_size"             value="$(var buffer_size)"/>
+    <remap from="cloud_registered"        to="$(var input_cloud_topic)"/>
+    <remap from="Odometry"                to="$(var odometry_topic)"/>
+    <remap from="assembled_cloud"         to="$(var assembled_cloud_topic)"/>
+  </node>
+</launch>

@@ -1,0 +1,98 @@
+<launch>
+
+  <set_parameter name="use_sim_time" value="false"/>
+
+  <!-- ************************************************************************ -->
+  <!-- LIVOX HALLWAY DETECTOR -->
+  <!-- ************************************************************************ -->
+
+  <!-- Livox repub -->
+
+  <let name="livox_lidar_topic" value="livox/lidar"/>
+  <let name="livox_cloud_topic" value="livox/cloud"/>
+
+  <include file="$(find-pkg-share eut_pcl_utils)/launch/livox_repub.launch.xml">
+    <arg name="input_cloud_topic"  value="$(var livox_lidar_topic)"/>
+    <arg name="output_cloud_topic" value="$(var livox_cloud_topic)"/>
+  </include>
+
+  <!-- Hallway detector -->
+
+  <let name="livox_hallway_detector_name"               value="livox_hallway_detector"/>
+  <let name="livox_hallway_detector_config_file"        value="$(find-pkg-share r4c_bringup)/config/livox_hallway_detector.yaml"/>
+  <let name="livox_hallway_detector_line_markers_topic" value="/$(var livox_hallway_detector_name)/line_markers"/>
+
+  <include file="$(find-pkg-share eut_hallway_detector)/launch/hallway_detector.launch.xml">
+    <arg name="node_name"          value="$(var livox_hallway_detector_name)"/>
+    <arg name="config_file"        value="$(var livox_hallway_detector_config_file)"/>
+    <arg name="input_cloud_topic"  value="$(var livox_cloud_topic)"/>
+    <arg name="line_markers_topic" value="$(var livox_hallway_detector_line_markers_topic)"/>
+  </include>
+
+  <!-- Crop row path estimator -->
+
+  <let name="livox_crop_row_estimator_name"              value="livox_crop_row_estimator"/>
+  <let name="livox_crop_row_estimator_config_file"       value="$(find-pkg-share r4c_bringup)/config/livox_crop_row_estimator.yaml"/>
+  <let name="livox_crop_row_estimator_global_plan_topic" value="/$(var livox_crop_row_estimator_name)/central_path"/>
+
+  <include file="$(find-pkg-share eut_crop_row_estimator)/launch/crop_row_estimator.launch.xml">
+    <arg name="node_name"         value="$(var livox_crop_row_estimator_name)"/>
+    <arg name="config_file"       value="$(var livox_crop_row_estimator_config_file)"/>
+    <arg name="lines_topic"       value="$(var livox_hallway_detector_line_markers_topic)"/>
+    <arg name="global_plan_topic" value="$(var livox_crop_row_estimator_global_plan_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- RS-LIDAR HALLWAY DETECTOR -->
+  <!-- ************************************************************************ -->
+
+  <let name="rslidar_topic"          value="rslidar_points"/>
+  <let name="rslidar_filtered_topic" value="rslidar_points/filtered"/>
+
+  <node pkg="eut_pcl_utils" exec="rslidar_horizontal_angle_range_filter_node" name="rslidar_filter" output="screen">
+    <param name="min_angle" value="-3.14"/>
+    <param name="max_angle" value="3.14"/>
+    <param name="min_range" value="0.5"/>
+    <param name="max_range" value="200.0"/>
+    <remap from="/rslidar_points"          to="$(var rslidar_topic)"/>
+    <remap from="/rslidar_points/filtered" to="$(var rslidar_filtered_topic)"/>
+  </node>
+
+  <!-- Hallway detector -->
+
+  <let name="rs_hallway_detector_name"               value="rs_hallway_detector"/>
+  <let name="rs_hallway_detector_config_file"        value="$(find-pkg-share r4c_bringup)/config/rs_hallway_detector.yaml"/>
+  <let name="rs_hallway_detector_line_markers_topic" value="/$(var rs_hallway_detector_name)/line_markers"/>
+
+  <include file="$(find-pkg-share eut_hallway_detector)/launch/hallway_detector.launch.xml">
+    <arg name="node_name"          value="$(var rs_hallway_detector_name)"/>
+    <arg name="config_file"        value="$(var rs_hallway_detector_config_file)"/>
+    <arg name="input_cloud_topic"  value="$(var rslidar_filtered_topic)"/>
+    <arg name="line_markers_topic" value="$(var rs_hallway_detector_line_markers_topic)"/>
+  </include>
+
+  <!-- Crop row path estimator -->
+
+  <let name="rs_crop_row_estimator_name"              value="rs_crop_row_estimator"/>
+  <let name="rs_crop_row_estimator_config_file"       value="$(find-pkg-share r4c_bringup)/config/rs_crop_row_estimator.yaml"/>
+  <let name="rs_crop_row_estimator_global_plan_topic" value="/$(var rs_crop_row_estimator_name)/central_path"/>
+
+  <include file="$(find-pkg-share eut_crop_row_estimator)/launch/crop_row_estimator.launch.xml">
+    <arg name="node_name"         value="$(var rs_crop_row_estimator_name)"/>
+    <arg name="config_file"       value="$(var rs_crop_row_estimator_config_file)"/>
+    <arg name="lines_topic"       value="$(var rs_hallway_detector_line_markers_topic)"/>
+    <arg name="global_plan_topic" value="$(var rs_crop_row_estimator_global_plan_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- RVIZ -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rviz"         default="false"/>
+  <arg name="rviz_config_file" default="$(find-pkg-share r4c_bringup)/rviz/hallway_detector_benchmark.rviz"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/rviz.launch.xml" if="$(var use_rviz)">
+    <arg name="config_file" value="$(var rviz_config_file)"/>
+  </include>
+
+</launch>

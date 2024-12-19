@@ -1,0 +1,6 @@
+fake_localization:
+  ros__parameters:
+    global_frame: map
+    odom_frame: odom
+    base_frame: base_footprint
+    base_ground_truth_topic: /ground_truth/state

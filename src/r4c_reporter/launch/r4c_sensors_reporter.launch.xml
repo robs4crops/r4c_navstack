@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="use_oakd"      default="false"/>
+  <arg name="use_um7"       default="false"/>
+  <arg name="use_rslidar"   default="false"/>
+  <arg name="use_livox"     default="false"/>
+  <arg name="use_ublox"     default="false"/>
+
+  <arg name="r4c_reporter_params_file" default="$(find-pkg-share r4c_reporter)/config/r4c_reporter_config.yaml"/>
+
+  <node pkg="r4c_reporter" exec="sensors_reporter_node" name="sensors_reporter" output="screen">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="camera_reporter_node" name="oakd_reporter" output="screen" if="$(var use_oakd)">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="lidar_reporter_node" name="livox_reporter" output="screen" if="$(var use_livox)">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="lidar_reporter_node" name="rslidar_reporter" output="screen" if="$(var use_rslidar)">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="gnss_reporter_node" name="ublox_reporter" output="screen" if="$(var use_ublox)">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <node pkg="r4c_reporter" exec="imu_reporter_node" name="um7_reporter" output="screen" if="$(var use_um7)">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+</launch>

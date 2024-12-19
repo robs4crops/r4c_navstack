@@ -1,0 +1,14 @@
+diff_drive_joint_states_to_twist:
+  ros__parameters:
+    left_wheel_joint_name: "left_axle"
+    right_wheel_joint_name: "right_axle"
+    wheel_radius: 0.391
+    wheel_spacing: 1.01722
+    joint_states_topic: joint_states
+    twist_topic: r4c_tractor/vel
+
+can2ros_adapter:
+  ros__parameters:
+    wheel_radius: 0.391
+    inverter_max_torque: 25.0
+

@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+
+<!-- This launch file is intended to be used with bag files, hence /clock topic must be used. -->
+<!--
+In terminal 1:
+ros2 bag play <bag_file> __topics /can_msg_from_can_bus /rslidar_points /um7/imu/data -r 5.0
+or
+ros2 bag play <bag_file> __topics /can_msg_from_can_bus /livox/lidar    /livox/imu    -r 5.0
+
+In terminal 2:
+
+ros2 launch r4c_bringup test_gnss_localization.launch.xml use_fast_lio:=true use_rslidar:=true rslidar_topic:=/rslidar_points rslidar_converted_topic:=/rslidar_converted
+-->
+
+<launch>
+
+  <!-- ************************************************************************ -->
+  <!-- COMMON ARGS -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_sim_time"            default="true"/>
+  <set_parameter name="use_sim_time"  value="$(var use_sim_time)"/>
+
+  <let name="robot_model_name"        value="r4c_tractor"/>
+  <arg name="large_scale_pilot"       default="es"/>
+
+  <arg name="odometry_frame"          default="odom"/>
+  <arg name="robot_base_frame"        default="base_footprint"/>
+
+  <arg name="twist_topic"             default="$(var robot_model_name)/vel"/>
+  <arg name="twist_cmd_topic"         default="$(var robot_model_name)/cmd_vel"/>
+  <arg name="joint_states_topic"      default="joint_states"/>
+  <arg name="wheel_odometry_topic"    default="$(var robot_model_name)/wheel_odom"/>
+  <arg name="lidar_odometry_topic"    default="Odometry" /> <!-- $(var robot_model_name)/lidar_odom -->
+
+  <!-- ************************************************************************ -->
+  <!-- ROBOT DESCRIPTION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="robot_description_file" default="$(find-pkg-share r4c_description)/urdf/r4c_tractor.xacro"/>
+
+  <node pkg="robot_state_publisher" exec="robot_state_publisher">
+    <param name='robot_description' value="$(command 'xacro $(var robot_description_file)')"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- GROUND VEHICLE ODOMETRY BY TWIST -->
+  <!-- ************************************************************************ -->
+
+  <arg name="first_twist_timeout"           default="120.0"/>
+
+  <!-- Odometry computed with the vehicle's current twist -->
+
+  <node pkg="eut_ground_vehicle_twist_odometry" exec="ground_vehicle_twist_odometry_node" name="gv_twist_odometry" output="screen">
+    <param name="odometry_frame"          value="$(var odometry_frame)"/>
+    <param name="robot_base_frame"        value="$(var robot_base_frame)"/>
+    <param name="first_twist_timeout"     value="$(var first_twist_timeout)"/>
+    <param name="publish_tf"              value="true"/>
+
+    <remap from="twist"                   to="$(var twist_topic)"/>
+    <remap from="odometry"                to="$(var wheel_odometry_topic)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- LOCALIZATION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rslidar"             default="true"/>
+  <arg name="rslidar_topic"           default="/rslidar_points"/>
+  <arg name="rslidar_converted_topic" default="/rslidar_converted"/>
+
+  <arg name="use_livox"               default="false"/>
+
+  <arg name="use_fast_lio"            default="false"/>
+  <let name="slam_mode"               value="localization"/> <!-- mapping / localization -->
+  <!--
+  slam_sensor can be either 'rslidar', 'avia' or 'mid70', but for the time being we consider only
+  rslidar or avia depending on the value of the flag use_rslidar and use_livox.
+  -->
+  <let name="slam_sensor"  value="rslidar" if="$(var use_rslidar)"/>
+  <let name="slam_sensor"  value="avia"    if="$(var use_livox)"/>
+
+  <group if="$(var use_fast_lio)">
+
+    <node pkg="eut_pcl_utils" exec="rshelios_converter_node" name="rshelios_converter" output="screen" if="$(var use_rslidar)">
+      <remap from="/rslidar_points"    to="$(var rslidar_topic)"/>
+      <remap from="/rslidar_converted" to="$(var rslidar_converted_topic)"/>
+    </node>
+
+    <include file="$(find-pkg-share eut_fast_lio)/launch/mapping.launch.py">
+      <!--
+      This configuration file contain topics definition that must match some of those topics defined
+      right before including the launch file for the sensors.
+      -->
+      <arg name="config_path" value="$(find-pkg-share r4c_localization)/config/eut_fast_lio_$(var slam_sensor)_$(var slam_mode).yaml"/>
+    </include>
+  </group>
+
+  <include file="$(find-pkg-share r4c_localization)/launch/r4c_gnss_localization.launch.py"/>
+
+  <!-- ************************************************************************ -->
+  <!-- ACKERMANN TWIST TO JOINT STATES -->
+  <!-- ************************************************************************ -->
+
+  <arg name="ackermann_twist_to_joint_states_config_file" default="$(find-pkg-share r4c_bringup)/config/ackermann_twist_to_joint_states.yaml"/>
+
+  <node pkg="ackermann_joint_states_utils" exec="ackermann_twist_to_joint_states_node" name="ackermann_twist_to_joint_states" output="screen">
+    <param from="$(var ackermann_twist_to_joint_states_config_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- CAN ADAPTERS -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_can2ros_adapter"          default="false"/>
+  <arg name="use_ros2can_adapter"          default="false"/>
+  <arg name="r4c_can_adapters_params_file" default="$(find-pkg-share r4c_can_adapter)/config/can_adapters_tractor_$(var large_scale_pilot).yaml"/>
+
+  <node pkg="r4c_can_adapter" exec="tractor_can2ros_adapter_node" name="tractor_can2ros_adapter" output="screen" if="$(var use_can2ros_adapter)">
+    <param from="$(var r4c_can_adapters_params_file)"/>
+  </node>
+
+  <node pkg="r4c_can_adapter" exec="tractor_ros2can_adapter_node" name="tractor_ros2can_adapter" output="screen" if="$(var use_ros2can_adapter)">
+    <param from="$(var r4c_can_adapters_params_file)"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- ODOM GNSS PUBLISHER -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_odom_gnss"             default="false"/>
+  <arg name="odom_gnss_config_file"     default="$(find-pkg-share r4c_bringup)/config/odom_gnss_publisher.yaml"/>
+  <arg name="odom_gnss_topic"           default="$(var robot_model_name)/odom_gnss"/>
+  <arg name="r4c_gnss_init_config_file" default="$(find-pkg-share r4c_bringup)/config/r4c_gnss_init_tractor.yaml"/>
+
+  <group if="$(var use_odom_gnss)">
+
+    <node pkg="r4c_bringup" exec="r4c_gnss_init_node" name="r4c_gnss_init" output="screen">
+      <param from="$(var r4c_gnss_init_config_file)"/>
+    </node>
+
+    <node pkg="robot_localization" exec="navsat_transform_node" name="odom_gnss_publisher" output="screen">
+      <param from="$(var odom_gnss_config_file)"/>
+      <remap from="odometry/filtered" to="$(var lidar_odometry_topic)"/>
+      <remap from="gps/filtered"      to="$(var odom_gnss_topic)"/>
+    </node>
+  </group>
+
+  <!-- ************************************************************************ -->
+  <!-- RVIZ -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rviz"         default="false"/>
+  <arg name="rviz_config_file" default="$(find-pkg-share r4c_bringup)/rviz/r4c.rviz"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/rviz.launch.xml" if="$(var use_rviz)">
+    <arg name="config_file" value="$(var rviz_config_file)"/>
+  </include>
+
+</launch>

@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="lidar_3d" params="config_file">
+
+    <xacro:property name="conf_file" value="${config_file}"/>
+    <xacro:property name="config"    value="${xacro.load_yaml(conf_file)}"/>
+
+    <xacro:property name="mass"   value="${config['mass']}"/>
+    <xacro:property name="size_x" value="${config['size']['x']}"/>
+    <xacro:property name="size_y" value="${config['size']['y']}"/>
+    <xacro:property name="size_z" value="${config['size']['z']}"/>
+
+    <link name="${config['base_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_parent_frame_base_frame']['name']}" type="fixed">
+      <parent link="${config['parent_frame']}"/>
+      <child link="${config['base_frame']}"/>
+      <origin rpy="${config['joint_parent_frame_base_frame']['R']}
+      ${config['joint_parent_frame_base_frame']['P']}
+      ${config['joint_parent_frame_base_frame']['Y']}"
+      xyz="${config['joint_parent_frame_base_frame']['x']}
+      ${config['joint_parent_frame_base_frame']['y']}
+      ${config['joint_parent_frame_base_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['body_frame']}">
+      <visual>
+        <geometry>
+          <mesh filename="package://${config['mesh']['package']}/${config['mesh']['relative_path']}" scale="1.0 1.0 1.0"/>
+        </geometry>
+        <material name="${config['body_frame']}_color">
+            <color rgba="${config['color']['r']} ${config['color']['g']} ${config['color']['b']} ${config['color']['a']}"/>
+        </material>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${size_x} ${size_y} ${size_z}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </collision>
+      <inertial>
+        <mass value="${mass}"/>
+        <inertia ixx="${(1.0/12.0) * mass * (size_y * size_y + size_z * size_z)}"  ixy="0.0" ixz="0.0"
+                 iyy="${(1.0/12.0) * mass * (size_x * size_x + size_z * size_z)}" iyz="0.0"
+                 izz="${(1.0/12.0) * mass * (size_x * size_x + size_y * size_y)}" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_base_frame_body_frame']['name']}" type="fixed">
+      <parent link="${config['base_frame']}"/>
+      <child link="${config['body_frame']}"/>
+      <origin rpy="${config['joint_base_frame_body_frame']['R']}
+      ${config['joint_base_frame_body_frame']['P']}
+      ${config['joint_base_frame_body_frame']['Y']}"
+      xyz="${config['joint_base_frame_body_frame']['x']}
+      ${config['joint_base_frame_body_frame']['y']}
+      ${config['joint_base_frame_body_frame']['z']}"/>
+    </joint>
+
+    <link name="${config['data_frame']}">
+      <inertial>
+        <mass value="0.1"/>
+        <inertia ixx="0.000001" ixy="0.0" ixz="0.0" iyy="0.000001" iyz="0.0" izz="0.000001"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      </inertial>
+    </link>
+
+    <joint name="${config['joint_body_frame_data_frame']['name']}" type="fixed">
+      <parent link="${config['body_frame']}"/>
+      <child link="${config['data_frame']}"/>
+      <origin rpy="${config['joint_body_frame_data_frame']['R']}
+      ${config['joint_body_frame_data_frame']['P']}
+      ${config['joint_body_frame_data_frame']['Y']}"
+      xyz="${config['joint_body_frame_data_frame']['x']}
+      ${config['joint_body_frame_data_frame']['y']}
+      ${config['joint_body_frame_data_frame']['z']}"/>
+    </joint>
+
+    <xacro:if value="${config['plugin']['enabled'] == 1}">
+      <gazebo reference="${config['data_frame']}">
+        <sensor type="ray" name="${config['name']}_gzb_sensor">
+          <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+          <update_rate>${config['plugin']['update_rate']}</update_rate>
+          <visualize>${config['plugin']['visualize']}</visualize>
+          <ray>
+            <scan>
+              <horizontal>
+                <min_angle>${config['plugin']['horizontal_scanning']['min_angle']}</min_angle>
+                <max_angle>${config['plugin']['horizontal_scanning']['max_angle']}</max_angle>
+                <samples>${config['plugin']['horizontal_scanning']['samples']}</samples>
+                <resolution>1</resolution>
+              </horizontal>
+              <vertical>
+                <min_angle>${config['plugin']['vertical_scanning']['min_angle']}</min_angle>
+                <max_angle>${config['plugin']['vertical_scanning']['max_angle']}</max_angle>
+                <samples>  ${config['plugin']['vertical_scanning']['samples']}</samples>
+                <resolution>1</resolution>
+              </vertical>
+            </scan>
+            <range>
+              <min>${config['plugin']['range']['min']}</min>
+              <max>${config['plugin']['range']['max']}</max>
+              <resolution>${config['plugin']['range']['resolution']}</resolution>
+            </range>
+            <noise>
+              <type>${config['plugin']['noise']['type']}</type>
+              <mean>${config['plugin']['noise']['mean']}</mean>
+              <stddev>${config['plugin']['noise']['stddev']}</stddev>
+            </noise>
+          </ray>
+          <plugin filename="libgazebo_ros_velodyne_laser.so" name="${config['name']}_gzb_ros_velodyne_laser_plugin">
+            <ros>
+              <remapping>~/out:=${config['plugin']['topic']}</remapping>
+            </ros>
+            <organize_cloud>${config['plugin']['organize_cloud']}</organize_cloud>
+            <min_range>${config['plugin']['range']['min']}</min_range>
+            <max_range>${config['plugin']['range']['max']}</max_range>
+            <min_intensity>${config['plugin']['min_intensity']}</min_intensity>
+            <gaussian_noise>${config['plugin']['noise']['mean']}</gaussian_noise>
+          </plugin>
+        </sensor>
+      </gazebo>
+    </xacro:if>
+  </xacro:macro>
+</robot>

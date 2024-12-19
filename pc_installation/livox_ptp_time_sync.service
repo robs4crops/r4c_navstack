@@ -1,0 +1,8 @@
+[Unit]
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/local/bin/livox_ptp_time_sync.sh
+
+[Install]
+WantedBy=multi-user.target

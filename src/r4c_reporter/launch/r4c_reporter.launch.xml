@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="use_oakd"      default="false"/>
+  <arg name="use_um7"       default="false"/>
+  <arg name="use_rslidar"   default="false"/>
+  <arg name="use_livox"     default="false"/>
+  <arg name="use_ublox"     default="false"/>
+  <arg name="use_can"       default="false"/>
+
+  <arg name="r4c_reporter_params_file" default="$(find-pkg-share r4c_reporter)/config/r4c_reporter_config.yaml"/>
+
+  <node pkg="r4c_reporter" exec="tractor_reporter_node" name="tractor_reporter" output="screen">
+    <param from="$(var r4c_reporter_params_file)"/>
+  </node>
+
+  <include file="$(find-pkg-share r4c_reporter)/launch/r4c_sensors_reporter.launch.xml">
+    <arg name="use_oakd"                      value="$(var use_oakd)" />
+    <arg name="use_um7"                       value="$(var use_um7)" />
+    <arg name="use_rslidar"                   value="$(var use_rslidar)" />
+    <arg name="use_livox"                     value="$(var use_livox)" />
+    <arg name="use_ublox"                     value="$(var use_ublox)" />
+    <arg name="r4c_reporter_params_file"      value="$(var r4c_reporter_params_file)" />
+  </include>
+
+  <include file="$(find-pkg-share r4c_reporter)/launch/r4c_communication_reporter.launch.xml">
+    <arg name="use_can"                       value="$(var use_can)" />
+    <arg name="r4c_reporter_params_file"      value="$(var r4c_reporter_params_file)" />
+  </include>
+
+  <include file="$(find-pkg-share r4c_reporter)/launch/r4c_localization_reporter.launch.xml">
+    <arg name="r4c_reporter_params_file"      value="$(var r4c_reporter_params_file)" />
+  </include>
+
+</launch>

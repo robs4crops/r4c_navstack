@@ -1,0 +1,19 @@
+# Configuration Settings for C94-M8P device
+mbase:
+  mbase:
+    ros__parameters:
+      debug: 1                    # Range 0-4 (0 means no debug statements will print)
+      device: /dev/ttyUSB1
+      frame_id: mbase
+      uart1:
+        baudrate: 115200
+      
+      config_on_startup: false
+
+      publish:
+        all: false
+        nav:
+          all: true
+          relposned: true
+          posllh: true
+          posecef: true

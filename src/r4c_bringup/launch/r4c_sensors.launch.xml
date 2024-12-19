@@ -1,0 +1,64 @@
+<launch>
+
+  <arg name="use_rslidar" default="false"/>
+  <arg name="use_um7"     default="false"/>
+  <arg name="use_livox"   default="false"/>
+  <arg name="use_mid360"  default="false"/>
+  <arg name="use_oakd"    default="false"/>
+  <arg name="use_ublox"   default="false"/>
+
+  <!--
+  rslidar_sdk_node publishes the topic specified in config file
+  $(find-pkg-share rslidar_sdk)/config/config.yaml, in the field 'ros_send_point_cloud_topic'.
+  In this project:
+  ros_send_point_cloud_topic: /rslidar_points #Topic used to send point cloud through ROS
+  -->
+
+  <include file="$(find-pkg-share rslidar_sdk)/launch/start.py" if="$(var use_rslidar)"/>
+
+  <arg name="um7_data_topic"        default="um7/imu/data"/>
+  <arg name="um7_mag_topic"         default="um7/imu/mag"/>
+  <arg name="um7_rpy_topic"         default="um7/imu/rpy"/>
+  <arg name="um7_temperature_topic" default="um7/imu/temperature"/>
+
+  <node pkg="um7" exec="um7_node" name="um7_node" output="screen" if="$(var use_um7)">
+    <param name="update_rate"     value="30"/>
+    <param name="frame_id"        value="um7_link"/>
+    <remap from="imu/data"        to="$(var um7_data_topic)"/>
+    <remap from="imu/mag"         to="$(var um7_mag_topic)"/>
+    <remap from="imu/rpy"         to="$(var um7_rpy_topic)"/>
+    <remap from="imu/temperature" to="$(var um7_temperature_topic)"/>
+  </node>
+
+  <arg name="livox_lidar_topic" default="livox/lidar"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/livox_lidar.launch.xml" if="$(var use_livox)">
+    <!-- 0: Pointcloud2(PointXYZRTL), 1: Customized pointcloud format -->
+    <arg name="xfer_format"           value="1"/>
+    <arg name="publish_freq"          value="10.0"/>
+    <!-- 0: Publish message, 1: Output to bag file -->
+    <arg name="output_data_type"      value="0"/>
+    <arg name="frame_id"              value="livox_lidar_link"/>
+    <arg name="cmdline_input_bd_code" value="3JEDK38001Q1631"/>
+    <arg name="user_config_path"      value="$(find-pkg-share r4c_bringup)/params/livox_lidar_3JEDK38001Q1631_config.json"/>
+    <arg name="livox_lidar_topic"     value="$(var livox_lidar_topic)"/>
+  </include>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/livox_mid360.launch.py" if="$(var use_mid360)" />
+
+  <include file="$(find-pkg-share eut_depthai)/launch/eut_depthai_publisher.launch.xml" if="$(var use_oakd)">
+    <arg name="tf_prefix"     value="oak"/>
+    <arg name="mxId"          value="18443010E14EDD0F00"/>
+    <arg name="usb2Mode"      value="true" />
+    <arg name="publish_urdf"  value="false"/>
+  </include>
+
+  <arg name="ublox_rtk" default="true"/>
+  <arg name="ublox_vrs" default="true"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/ublox.launch.xml" if="$(var use_ublox)">
+    <arg name="rtk"  value="$(var ublox_rtk)"/>
+    <arg name="vrs"  value="$(var ublox_vrs)"/>
+  </include>
+
+</launch>

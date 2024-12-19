@@ -1,0 +1,80 @@
+name: livox_avia_lidar
+size:
+  x: 0.0910
+  y: 0.0612
+  z: 0.0648
+mass: 0.498
+color:
+  r: 1.0
+  g: 1.0
+  b: 1.0
+  a: 0.7
+parent_frame: base_link
+base_frame: livox_mid360_lidar_base_link
+body_frame: livox_mid360_lidar_body_link
+data_frame: livox_mid360_lidar_link
+joint_parent_frame_base_frame:
+  name: livox_mid360_lidar_base_joint
+  R: 0.0
+  P: 0.5235
+  Y: 0.0
+  x: 1.75
+  y: 0.0
+  z: 0.025
+joint_base_frame_body_frame:
+  name: livox_mid360_lidar_body_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.047
+joint_body_frame_data_frame:
+  name: livox_mid360_lidar_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.0
+mesh:
+  package: r4c_description
+  relative_path: meshes/livox_avia_lidar.stl
+plugin:
+  enabled: 0
+  visualize: false
+  update_rate: 10.0
+  topic: livox/lidar
+# 35.2 deg = 0.614355897 rad
+# samples = (max_angle - min_angle)/resolution + 1
+#         = (35.2 - -35.2)/resolution + 1
+#         = 70.4/resolution + 1
+# resolution of 0.1 deg (for example)
+# samples = 70.4/0.1 + 1 = 705
+  horizontal_scanning:
+    min_angle: -0.614355897
+    max_angle: 0.614355897
+    samples: 705
+# 38.6 deg  = 0.673697091 rad
+# To have integer divions we will use:
+# min_angle = -38.5 deg (0.671951762 rad)
+# max_angle = +38.5 deg (0.671951762 rad)
+# samples = (max_angle - min_angle)/resolution + 1
+#         = (38.5 - -38.5)/resolution + 1
+#         = 77.0/resolution + 1
+# resolution of 0.5 deg (for example)
+# samples = 77.0/0.5 + 1 = 155
+  vertical_scanning:
+    min_angle: -0.671951762
+    max_angle: 0.671951762
+    samples: 155
+  range:
+    min: 0.04
+    max: 50.0
+    resolution: 0.01
+  noise:
+    type: gaussian
+    mean: 0.0
+    stddev: 0.01
+  organize_cloud: false
+  min_intensity: 0.00000000001

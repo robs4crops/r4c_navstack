@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<sdf version='1.7'>
+  <world name='default'>
+        <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>37.94375462117764</latitude_deg>
+      <longitude_deg>22.772031169116122</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0.0</heading_deg>
+    </spherical_coordinates>
+
+    <!-- Relaxing physics update_rate (original 1000) and max_step_size (0.001) -->
+    <physics type='ode'>
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+
+    <include>
+      <name>ROW_0</name>
+      <uri>model://greek_row</uri>
+      <pose>-0.03048 -5.9547 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_1</name>
+      <uri>model://greek_row</uri>
+      <pose>2.2455487 -7.7523367 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_2</name>
+      <uri>model://greek_row</uri>
+      <pose>4.1291659 -9.70624 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_3</name>
+      <uri>model://greek_row</uri>
+      <pose>6.32672 -11.425687 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_4</name>
+      <uri>model://greek_row</uri>
+      <pose>8.186568 -13.27504 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_5</name>
+      <uri>model://greek_row</uri>
+      <pose>10.3661550 -15.0508928 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_6</name>
+      <uri>model://greek_row</uri>
+      <pose>12.34759 -16.53077 0 0 0</pose>
+    </include>
+
+    <!-- <include>
+      <name>ROW_7</name>
+      <uri>model://greek_row</uri>
+      <pose>13.527 -17.0187 0 0 0</pose>
+    </include> -->
+
+    <!-- <include>
+      <name>ROW_8</name>
+      <uri>model://greek_row</uri>
+      <pose>15.5311 -19.0142 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_9</name>
+      <uri>model://greek_row</uri>
+      <pose>17.712 -20.834 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>ROW_10</name>
+      <uri>model://greek_row</uri>
+      <pose>19.9513 -22.418 0 0 0</pose>
+    </include> -->
+  </world>
+</sdf>

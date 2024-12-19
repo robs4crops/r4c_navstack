@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <!-- ************************************************************************ -->
+  <!-- ROBOT DESCRIPTION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="large_scale_pilot"      default="es"/>
+
+  <let name="robot_description_file" value="$(find-pkg-share r4c_description)/urdf/r4c_tractor.xacro" if="$(eval '\'$(var large_scale_pilot)\' == \'es\'')"/>
+  <let name="robot_description_file" value="$(find-pkg-share r4c_description)/urdf/r4c_carob.xacro"   if="$(eval '\'$(var large_scale_pilot)\' == \'gr\'')"/>
+
+  <node pkg="robot_state_publisher" exec="robot_state_publisher">
+    <param name='robot_description' value="$(command 'xacro $(var robot_description_file)')"/>
+  </node>
+
+  <!-- ************************************************************************ -->
+  <!-- LOCALIZATION -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rslidar" default="true"/> <!-- false means we use livox_avia -->
+
+  <let name="slam_sensor" value="rslidar" if="$(var use_rslidar)"/>
+  <let name="slam_sensor" value="avia"    unless="$(var use_rslidar)"/>
+
+  <group if="$(var use_rslidar)">
+    <arg name="rslidar_topic"           default="/rslidar_points"/>
+    <arg name="rslidar_converted_topic" default="/rslidar_converted"/>
+
+    <node pkg="eut_pcl_utils" exec="rshelios_converter_node" name="rshelios_converter" output="screen">
+      <remap from="/rslidar_points"    to="$(var rslidar_topic)"/>
+      <remap from="/rslidar_converted" to="$(var rslidar_converted_topic)"/>
+    </node>
+  </group>
+
+  <arg name="eut_fast_lio_mapping_config_file" default="$(find-pkg-share r4c_localization)/config/eut_fast_lio_$(var slam_sensor)_mapping_$(var large_scale_pilot).yaml"/>
+
+  <include file="$(find-pkg-share eut_fast_lio)/launch/mapping.launch.py">
+    <arg name="config_path" value="$(var eut_fast_lio_mapping_config_file)"/>
+  </include>
+
+</launch>

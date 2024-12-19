@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<robot name="depthai_camera" xmlns:xacro="http://ros.org/wiki/xacro">
+
+<xacro:macro name="depthai_camera" params="config_file">
+
+    <xacro:property name="M_PI"        value="3.1415926535897931" />
+
+    <xacro:property name="conf_file"   value="${config_file}"/>
+    <xacro:property name="config"      value="${xacro.load_yaml(conf_file)}"/>
+
+    <xacro:property name="camera_name" value="${config['name']}"/>
+    <xacro:property name="model"       value="${config['model']}"/>
+    <xacro:property name="parent"      value="${config['parent_frame']}"/>
+    <xacro:property name="base_frame"  value="${config['base_frame']}"/>
+    <xacro:property name="cam_pos_x"   value="${config['joint_parent_frame_base_frame']['x']}"/>
+    <xacro:property name="cam_pos_y"   value="${config['joint_parent_frame_base_frame']['y']}"/>
+    <xacro:property name="cam_pos_z"   value="${config['joint_parent_frame_base_frame']['z']}"/>
+    <xacro:property name="cam_roll"    value="${config['joint_parent_frame_base_frame']['R']}"/>
+    <xacro:property name="cam_pitch"   value="${config['joint_parent_frame_base_frame']['P']}"/>
+    <xacro:property name="cam_yaw"     value="${config['joint_parent_frame_base_frame']['Y']}"/>
+    <xacro:property name="r"           value="${config['color']['r']}"/>
+    <xacro:property name="g"           value="${config['color']['g']}"/>
+    <xacro:property name="b"           value="${config['color']['b']}"/>
+    <xacro:property name="a"           value="${config['color']['a']}"/>
+
+    <xacro:property name="has_imu" value="false" />
+
+    <!-- <xacro:if value="${model == 'BW1098OAK'}">
+    </xacro:if> -->
+
+    <xacro:property name="baseline" value="0.075" />
+
+    <xacro:if value="${model == 'OAK-D'}">
+      <xacro:property name="has_imu" value="true" />
+      <xacro:property name="imu_offset_x" value="0.0" />
+      <xacro:property name="imu_offset_y" value="-0.015" />
+      <xacro:property name="imu_offset_z" value="-0.013662" />
+      <xacro:property name="imu_r" value="0" />
+      <xacro:property name="imu_p" value="1.5708" />
+      <xacro:property name="imu_y" value="0" />
+    </xacro:if>
+
+    <!-- base_link of the sensor-->
+    <link name="${base_frame}"/>
+
+    <joint name="${camera_name}_center_joint" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${base_frame}"/>
+        <origin xyz="${cam_pos_x} ${cam_pos_y} ${cam_pos_z}" rpy="${cam_roll} ${cam_pitch} ${cam_yaw}" />
+    </joint>
+
+<!-- device Center -->
+    <link name="${camera_name}_model_origin">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://${config['mesh']['package']}/${config['mesh']['relative_path']}" />
+            </geometry>
+            <material name="mat">
+                <color rgba="${r} ${g} ${b} ${a}"/>
+            </material>
+        </visual>
+    </link>
+
+    <joint name="${camera_name}_model_origin_joint" type="fixed">
+        <parent link="${base_frame}"/>
+        <child link="${camera_name}_model_origin"/>
+        <origin xyz="0 0 0" rpy="1.5708 0 1.5708" />
+    </joint>
+
+<!-- IMU -->
+    <xacro:if value="${has_imu}">
+        <link name="${camera_name}_imu_frame" />
+        <joint name="${camera_name}_imu_joint" type="fixed">
+            <parent link="${base_frame}"/>
+            <child link="${camera_name}_imu_frame"/>
+            <origin xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}" rpy="${imu_r} ${imu_p} ${imu_y}" />
+        </joint>
+    </xacro:if>
+
+<!-- RGB Camera -->
+    <link name="${camera_name}_rgb_camera_frame" />
+
+    <joint name="${camera_name}_rgb_camera_joint" type="fixed">
+        <parent link="${base_frame}"/>
+        <child link="${camera_name}_rgb_camera_frame"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <link name="${camera_name}_rgb_camera_optical_frame"/>
+
+    <joint name="${camera_name}_rgb_camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-${M_PI/2} 0.0 -${M_PI/2}"/>
+        <parent link="${camera_name}_rgb_camera_frame"/>
+        <child link="${camera_name}_rgb_camera_optical_frame"/>
+    </joint>
+
+<!-- Left Camera -->
+    <link name="${camera_name}_left_camera_frame" />
+
+    <joint name="${camera_name}_left_camera_joint" type="fixed">
+        <parent link="${base_frame}"/>
+        <child link="${camera_name}_left_camera_frame"/>
+        <origin xyz="0 ${baseline/2} 0" rpy="0 0 0" />
+    </joint>
+
+    <link name="${camera_name}_left_camera_optical_frame"/>
+
+    <joint name="${camera_name}_left_camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-${M_PI/2} 0.0 -${M_PI/2}"/>
+        <parent link="${camera_name}_left_camera_frame"/>
+        <child link="${camera_name}_left_camera_optical_frame"/>
+    </joint>
+
+
+<!-- right Camera -->
+    <link name="${camera_name}_right_camera_frame" />
+
+    <joint name="${camera_name}_right_camera_joint" type="fixed">
+        <parent link="${base_frame}"/>
+        <child link="${camera_name}_right_camera_frame"/>
+        <origin xyz="0 -${baseline/2} 0" rpy="0 0 0" />
+    </joint>
+
+    <link name="${camera_name}_right_camera_optical_frame"/>
+
+    <joint name="${camera_name}_right_camera_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="-${M_PI/2} 0.0 -${M_PI/2}"/>
+        <parent link="${camera_name}_right_camera_frame"/>
+        <child link="${camera_name}_right_camera_optical_frame"/>
+    </joint>
+
+    <gazebo reference="${camera_name}_rgb_camera_frame">
+        <sensor type="camera" name="${config['plugin']['camera_name']}">
+          <update_rate>30.0</update_rate>
+          <camera name="${config['plugin']['camera_name']}">
+            <horizontal_fov>${config['plugin']['horizontal_fov']}</horizontal_fov>
+            <image>
+              <width>${config['plugin']['width']}</width>
+              <height>${config['plugin']['height']}</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.02</near>
+              <far>300</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+          </camera>
+          <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+            <ros>
+              <remapping>~/out:=/image</remapping>
+            </ros>
+            <alwaysOn>${config['plugin']['always_on']}</alwaysOn>
+            <cameraName>${config['plugin']['camera_name']}</cameraName>
+            <imageTopicName>${config['plugin']['image_topic']}</imageTopicName>
+            <cameraInfoTopicName>${config['plugin']['info_topic']}</cameraInfoTopicName>
+            <frameName>${camera_name}_rgb_camera_frame</frameName>
+            <hackBaseline>0.07</hackBaseline>
+            <distortionK1>0.0</distortionK1>
+            <distortionK2>0.0</distortionK2>
+            <distortionK3>0.0</distortionK3>
+            <distortionT1>0.0</distortionT1>
+            <distortionT2>0.0</distortionT2>
+          </plugin>
+        </sensor>
+      </gazebo>
+
+</xacro:macro>
+
+</robot>

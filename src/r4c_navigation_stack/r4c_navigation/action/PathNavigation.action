@@ -1,0 +1,40 @@
+# Goal definition
+
+# follow the given path until completion or failure
+nav_msgs/Path path
+# or subscribe to a path topic for reactive mode
+string global_plan_topic
+
+# controller to use
+string controller_id
+
+# direction and type of path and navigation type
+int32 path_type
+int32 path_dir
+int32 nav_type
+
+# check if goal has been reached
+bool check_goal_reached
+int32 num_checks             # only used in PATH_DIR_LAT
+
+# goal constant definitions
+int32 PATH_TYPE_ROW = 0
+int32 PATH_TYPE_MAN = 1
+
+int32 PATH_DIR_BWD = -1
+int32 PATH_DIR_LAT = 0
+int32 PATH_DIR_FWD = 1
+
+int32 NAV_TYPE_REACTIVE = 0
+int32 NAV_TYPE_MAP_BASED = 1
+---
+# Result definition
+bool success
+---
+# Feedback
+int32 status 
+int32 STATUS_WAITING = 0
+int32 STATUS_NO_PLAN = 1
+int32 STATUS_VALID_PLAN = 2
+int32 STATUS_RUNNING = 3
+int32 STATUS_INVALID_PLAN = 4

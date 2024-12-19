@@ -1,0 +1,2 @@
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6015", SYMLINK="sensors/zed_mbase", GROUP="root", MODE="0666"
+ATTRS{idVendor}=="1546", ATTRS{idProduct}=="01a9", SYMLINK="sensors/zed_rover", GROUP="root", MODE="0666"

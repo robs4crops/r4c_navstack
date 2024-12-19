@@ -1,0 +1,25 @@
+<launch>
+  <arg name = "xfer_format"           default="1"/>    <!-- 0: Pointcloud2(PointXYZRTL), 1: Customized pointcloud format -->
+  <let name = "multi_topic"           value="0"/>      <!-- 0: All lidars share the same topic, 1: One lidar one topic -->
+  <arg name = "data_src"              default="0"/>    <!-- 0: Data from raw lidar, 1: Data from lidar hub-->
+  <arg name = "publish_freq"          default="10.0"/>
+  <arg name = "output_data_type"      default="0"/>    <!-- 0: Publish message, 1: Output to bag file -->
+  <arg name = "frame_id"              default="livox_lidar_link"/>
+  <let name = "lvx_file_path"         value="/home/livox/livox_test.lvx"/>
+  <arg name = "cmdline_input_bd_code" description="this argument must be provided externally"/>
+  <arg name = "user_config_path"      description="this argument must be provided externally"/>
+  <arg name = "livox_lidar_topic"     default="livox/lidar"/>
+
+  <node pkg="livox_ros2_driver" exec="livox_ros2_driver_node" name="livox_lidar_publisher">
+    <param name="xfer_format"              value="$(var xfer_format)"/>
+    <param name="multi_topic"              value="$(var multi_topic)"/>
+    <param name="data_src"                 value="$(var data_src)"/>
+    <param name="publish_freq"             value="$(var publish_freq)"/>
+    <param name="output_data_type"         value="$(var output_data_type)"/>
+    <param name="frame_id"                 value="$(var frame_id)"/>
+    <param name="lvx_file_path"            value="$(var lvx_file_path)"/>
+    <param name="cmdline_input_bd_code"    value="$(var cmdline_input_bd_code)"/>
+    <param name="user_config_path"         value="$(var user_config_path)"/>
+    <remap from="livox/lidar"              to="$(var livox_lidar_topic)"/>
+  </node>
+</launch>

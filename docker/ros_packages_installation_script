@@ -1,0 +1,110 @@
+#!/bin/bash
+
+apt-get update
+apt-get -o Dpkg::Options::="--force-all" dist-upgrade --yes
+
+# Install dependencies for Luxonis Oak-D cameras.
+# From https://github.com/luxonis/depthai-core
+# Dependencies
+#  CMake >= 3.10
+#  C/C++14 compiler
+#  [optional] OpenCV 4 (required if building examples)
+#  MacOS: Optional brew install opencv
+#  Linux: Optional sudo apt install libopencv-dev
+
+apt-get install --yes --quiet --no-install-recommends libopencv-dev
+wget -qO- https://raw.githubusercontent.com/luxonis/depthai-ros/main/install_dependencies.sh | bash
+
+curl -fsSL https://packages.osrfoundation.org/gazebo.key | gpg --dearmor -o /usr/share/keyrings/gazebo_stable.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gazebo_stable.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo_stable.list >/dev/null
+
+apt-get update
+apt-get -o Dpkg::Options::="--force-all" dist-upgrade --yes
+
+# Install core ROS packages.
+apt-get install --yes --quiet --no-install-recommends ros-${ROS_DISTRO}-angles \
+    ros-${ROS_DISTRO}-gazebo-ros-pkgs \
+    ros-${ROS_DISTRO}-gazebo-ros2-control \
+    ros-${ROS_DISTRO}-rqt \
+    ros-${ROS_DISTRO}-rqt-common-plugins \
+    ros-${ROS_DISTRO}-rqt-robot-steering \
+    ros-${ROS_DISTRO}-rqt-tf-tree \
+    ros-${ROS_DISTRO}-rviz-default-plugins \
+    ros-${ROS_DISTRO}-rviz2 \
+    ros-${ROS_DISTRO}-tlsf \
+    ros-${ROS_DISTRO}-tlsf-cpp \
+    ros-${ROS_DISTRO}-topic-monitor \
+    ros-${ROS_DISTRO}-ros-workspace \
+    ros-dev-tools
+
+# Install ROS packages project specific.
+apt-get install --yes --quiet --no-install-recommends  ros-${ROS_DISTRO}-async-web-server-cpp \
+    ros-${ROS_DISTRO}-behaviortree-cpp-v3 \
+    ros-${ROS_DISTRO}-can-msgs \
+    ros-${ROS_DISTRO}-depth-image-proc \
+    ros-${ROS_DISTRO}-depthai-ros \
+    ros-${ROS_DISTRO}-diagnostic-updater \
+    ros-${ROS_DISTRO}-eigen-stl-containers \
+    ros-${ROS_DISTRO}-foxglove-msgs \
+    ros-${ROS_DISTRO}-geodesy \
+    ros-${ROS_DISTRO}-image-common \
+    ros-${ROS_DISTRO}-image-pipeline \
+    ros-${ROS_DISTRO}-image-tools \
+    ros-${ROS_DISTRO}-image-transport-plugins \
+    ros-${ROS_DISTRO}-joy-linux \
+    ros-${ROS_DISTRO}-navigation2 \
+    ros-${ROS_DISTRO}-nmea-msgs \
+    ros-${ROS_DISTRO}-perception-pcl \
+    ros-${ROS_DISTRO}-plotjuggler-ros \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-robot-localization \
+    ros-${ROS_DISTRO}-ros-testing \
+    ros-${ROS_DISTRO}-ros2-socketcan \
+    ros-${ROS_DISTRO}-rtcm-msgs \
+    ros-${ROS_DISTRO}-twist-mux \
+    ros-${ROS_DISTRO}-velodyne-gazebo-plugins \
+    ros-${ROS_DISTRO}-vision-msgs \
+    ros-${ROS_DISTRO}-vision-opencv \
+    ros-${ROS_DISTRO}-xacro
+
+# Install Livox SDK
+git clone https://github.com/Livox-SDK/Livox-SDK.git /libraries/Livox-SDK
+
+cd /libraries/Livox-SDK
+
+# Fix errors in Livox-SDK repo
+
+git config --file "/root/.gitconfig" user.name "eutrob_root"
+git config --file "/root/.gitconfig" user.email "eutrob_root@eurecat.org"
+
+# https://github.com/Livox-SDK/Livox-SDK/pull/163/files
+# fix: compile error when using libstdc++11 #163
+
+git fetch origin pull/163/head:eut_fix_163
+
+# https://github.com/Livox-SDK/Livox-SDK/pull/168
+# updated -fPIC flag as indicated on https://github.com/Livox-SDK/livox_ros2_driver#9 #168
+
+git pull origin pull/168/head:eut_fix_168
+
+git checkout eut_fix_163
+git checkout -b eut_fix_163_168
+git merge eut_fix_168 -m "Merge pull requests 163 and 168"
+
+[ ! -e /libraries/Livox-SDK/build ] && mkdir -v /libraries/Livox-SDK/build
+cd /libraries/Livox-SDK/build
+cmake ..
+make
+make install
+
+# Install Livox SDK2 (for MID360)
+git clone https://github.com/Livox-SDK/Livox-SDK2.git /libraries/Livox-SDK2
+cd /libraries/Livox-SDK2
+mkdir build && cd build
+cmake .. && make
+sudo make install
+rm -f /root/.gitconfig
+
+apt-get clean autoclean
+apt-get autoremove --yes
+rm -rf /var/lib/apt/lists/*

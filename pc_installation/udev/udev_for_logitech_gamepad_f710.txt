@@ -1,0 +1,31 @@
+Linux udev rule file for device Logitech F710 gamepad
+
+On the gamepad, put the D ↔ X switch into the X position ("XInput Mode").
+
+You can test the gamepad using jstest or jstest-gtk.
+You can test force-feedback (rumble, vibration) using fftest.
+The "vibration" gamepad button toggles force-feedback, independently from PC.
+
+To figure out the correct name for any device, first plug the controller in and notice which 
+/dev/input/event* device is created.
+
+Supposing it is on /dev/input/event7, the following command can be run:
+
+udevadm info -a -n /dev/input/event7
+
+This will print out a lot of information, but only the first two entries are interesting.
+Find the line that says ATTRS{name}, and copy the value from there into the file called
+99-logitech-f710.rules.
+Then rename the SYMLINK to whatever you want.
+Copy that file into /etc/udev/rules.d/99-logitech-f710.rules.
+
+Run: udevadm control --reload-rules
+
+Now unplug and replug your device, and the symlink you've chosen should show up in /dev.
+
+To see the complete button/axis map, use: jscal -q /dev/input/event*
+
+Other diagnostic spells:
+udevadm monitor # plug/unplug
+udevadm monitor -a | grep -A20 event*
+

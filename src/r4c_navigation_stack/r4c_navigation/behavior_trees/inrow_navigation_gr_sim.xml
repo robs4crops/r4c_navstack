@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree drives a robot reactively from START to GOAL
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <CallEmptySrv service_name="/simple_crop_row_estimator/start"/>
+            <!-- <CallEmptySrv service_name="/hallway_detector/start"/> -->
+            <SetNavigationPoses input_goals="{goals}" pose_a="{START}" pose_b="{GOAL}" pose_c="{PARCEL_ORIGIN}" pose_d="{PARCEL_END}"/>
+            <DefineParcel enter_pose="{PARCEL_ORIGIN}" exit_pose="{PARCEL_END}" enter_dist="5.0" exit_dist="5.0" row_width="3.8" parcel_origin="{PARCEL_ORIGIN}" parcel_end="{PARCEL_END}" parcel_width="{PARCEL_WIDTH}"/>
+            <Sequence>
+                <PipelineSequence name="NavigateToPose">
+                    <RateController hz="2.0">
+                        <GetPathService path="{path}" path_updated="{path_updated}" service="/simple_crop_row_estimator/get_path" timeout="5.0"/>
+                    </RateController>
+                    <DoWhileInParcel src_node="{PARCEL_ORIGIN}" dst_node="{PARCEL_END}" row_width="{PARCEL_WIDTH}" invert_logic="false">
+                        <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+                    </DoWhileInParcel>
+                </PipelineSequence>
+            </Sequence>
+            <CallEmptySrv service_name="/simple_crop_row_estimator/stop"/>
+            <!-- <CallEmptySrv service_name="/hallway_detector/stop"/> -->
+        </Sequence>
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

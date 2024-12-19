@@ -1,0 +1,1 @@
+cmd_/home/eutrob/workspace/robs4crops/src/robs4crops/r4c/scripts/can_board/EMUC-B202/driver/modules.order := {   echo /home/eutrob/workspace/robs4crops/src/robs4crops/r4c/scripts/can_board/EMUC-B202/driver/emuc2socketcan.ko; :; } | awk '!x[$$0]++' - > /home/eutrob/workspace/robs4crops/src/robs4crops/r4c/scripts/can_board/EMUC-B202/driver/modules.order

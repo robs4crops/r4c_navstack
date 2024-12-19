@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree freely drives a robot to START
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+      <Sequence>
+          <!-- Get Poses from Action Goal -->
+          <SetNavigationPoses input_goals="{goals}" pose_a="{INITIAL_ROW_ORIGIN}" pose_b="{INITIAL_ROW_END}" pose_c="{GOAL_ROW_ORIGIN}" pose_d="{GOAL_ROW_END}"/>
+          <!-- Define Initial Parcel -->
+          <DefineParcel enter_pose="{INITIAL_ROW_ORIGIN}" exit_pose="{INITIAL_ROW_END}" enter_dist="5.0" exit_dist="5.0" row_width="3.8" parcel_origin="{INITIAL_PARCEL_ORIGIN}" parcel_end="{INITIAL_PARCEL_END}" parcel_width="{PARCEL_WIDTH}"/>
+          <!-- Define GOAL Parcel -->
+          <DefineParcel enter_pose="{GOAL_ROW_ORIGIN}" exit_pose="{GOAL_ROW_END}" enter_dist="5.0" exit_dist="5.0" row_width="3.8" parcel_origin="{GOAL_PARCEL_ORIGIN}" parcel_end="{GOAL_PARCEL_END}" parcel_width="{PARCEL_WIDTH}"/>
+          <!-- Get Origin of SMAC maneuver (where we stop exiting line straightly)-->
+          <GetManeuverOrigin current_parcel_origin="{INITIAL_ROW_ORIGIN}" current_parcel_end="{INITIAL_ROW_END}" parcel_origin="{GOAL_ROW_ORIGIN}" parcel_end="{GOAL_ROW_END}" man_exit_dist="1.5" man_origin_pose="{SMAC_ORIGIN}" />
+          <!-- Get End of SMAC maneuver (where we want to start alignment) -->
+          <GetAlignmentPose parcel_origin="{GOAL_ROW_ORIGIN}" parcel_end="{GOAL_ROW_END}"  vert_alignment_dist="2.5" lat_alignment_dist="0.00" alignment_orientation="0.0" alignment_pose="{SMAC_GOAL}"/>
+          <!-- Compute SMAC path -->
+          <ComputePathToPose start="{SMAC_ORIGIN}" goal="{SMAC_GOAL}" path="{smac_path}" planner_id="SmacHybrid"/>
+          <!-- Unite SMAC with initial row exit -->
+          <ComputeManeuverPath input_path="{smac_path}" current_parcel_end="{INITIAL_PARCEL_END}" output_path="{man_path}"/>
+          <!-- Extend path with final alignment path to enter row -->
+          <ExtendAlignedPath input_path="{man_path}" goal_pose="{GOAL_PARCEL_ORIGIN}" alignment_extension="13.0" output_path="{path}"/>
+          <!-- Navigate -->
+          <DoWhileInParcel src_node="{GOAL_PARCEL_ORIGIN}" dst_node="{GOAL_PARCEL_END}" row_width="{PARCEL_WIDTH}" invert_logic="true">
+              <FollowPath path="{path}" controller_id="VectorPursuit"/>
+          </DoWhileInParcel>
+      </Sequence>
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

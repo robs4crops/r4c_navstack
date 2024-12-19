@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="large_scale_pilot"      default="es"/>
+    <arg name="use_rslidar"            default="true"/>
+    <arg name="use_um7"                default="true"/>
+    <arg name="use_livox"              default="false"/>
+    <arg name="use_oakd"               default="false"/>
+    <arg name="use_ublox"              default="false"/>
+    <arg name="use_navigation"         default="true"/>
+    <arg name="use_localization"       default="true"/>
+    <arg name="use_slam"               default="true"/>
+    <arg name="use_cloud_assembler"    default="false"/>
+    <arg name="use_trunk_detector"     default="false"/>
+    <arg name="use_hallway_detector"   default="true"/>
+    <arg name="use_crop_row_estimator" default="true"/>
+    <arg name="use_can_bus_comm"       default="true"/>
+    <arg name="use_can2ros_adapter"    default="true"/>
+    <arg name="use_ros2can_adapter"    default="true"/>
+    <arg name="use_odom_gnss"          default="false"/>
+    <arg name="use_commander"          default="true"/>
+    <arg name="use_rviz"               default="false"/>
+    <arg name="navigation_tree"        default="navigate_to_pose"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/r4c_tractor_bringup.launch.xml">
+    <arg name="large_scale_pilot"      value="$(var large_scale_pilot)"/>
+    <arg name="use_rslidar"            value="$(var use_rslidar)"/>
+    <arg name="use_um7"                value="$(var use_um7)"/>
+    <arg name="use_livox"              value="$(var use_livox)"/>
+    <arg name="use_oakd"               value="$(var use_oakd)"/>
+    <arg name="use_ublox"              value="$(var use_ublox)"/>
+    <arg name="use_navigation"         value="$(var use_navigation)"/>
+    <arg name="use_localization"       value="$(var use_localization)"/>
+    <arg name="use_slam"               value="$(var use_slam)"/>
+    <arg name="use_cloud_assembler"    value="$(var use_cloud_assembler)"/>
+    <arg name="use_trunk_detector"     value="$(var use_trunk_detector)"/>
+    <arg name="use_hallway_detector"   value="$(var use_hallway_detector)"/>
+    <arg name="use_crop_row_estimator" value="$(var use_crop_row_estimator)"/>
+    <arg name="use_can_bus_comm"       value="$(var use_can_bus_comm)"/>
+    <arg name="use_can2ros_adapter"    value="$(var use_can2ros_adapter)"/>
+    <arg name="use_ros2can_adapter"    value="$(var use_ros2can_adapter)"/>
+    <arg name="use_odom_gnss"          value="$(var use_odom_gnss)"/>
+    <arg name="use_rviz"               value="$(var use_rviz)"/>
+    <arg name="navigation_tree"        value="$(var navigation_tree)"/>
+  </include>
+
+</launch>

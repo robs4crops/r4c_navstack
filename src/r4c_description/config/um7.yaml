@@ -1,0 +1,80 @@
+name: um7
+size:
+  x: 0.028
+  y: 0.027
+  z: 0.009
+mass: 0.100
+color:
+  r: 1.0
+  g: 0.0
+  b: 0.0
+  a: 1.0
+parent_frame: rslidar_base_link
+base_frame: um7_base_link
+body_frame: um7_body_link
+data_frame: um7_link
+joint_parent_frame_base_frame:
+  name: um7_base_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.010
+  y: -0.007
+  z: 0.116
+joint_base_frame_body_frame:
+  name: um7_body_joint
+  R: 0.0
+  P: 0.0
+  Y: 0.0
+  x: 0.0
+  y: 0.0
+  z: 0.0045
+joint_body_frame_data_frame:
+  name: um7_joint
+  R: 0.0
+  P: 3.141592654
+  Y: 3.141592654
+  x: -0.010
+  y: 0.007
+  z: 0.0045
+plugin:
+  enabled: 1
+  always_on: true
+  update_rate: 100.0
+  visualize: false
+  topic: /um7/imu/data
+  angular_velocity:
+   gaussian_noise:
+    x:
+     mean: 0.0
+     stddev: 2E-4
+     bias_mean: 0.0000075
+     bias_stddev: 0.0000008
+    y:
+     mean: 0.0
+     stddev: 2E-4
+     bias_mean: 0.0000075
+     bias_stddev: 0.0000008
+    z:
+     mean: 0.0
+     stddev: 2E-4
+     bias_mean: 0.0000075
+     bias_stddev: 0.0000008
+  linear_acceleration:
+   gaussian_noise:
+    x:
+     mean: 0.0
+     stddev: 1.7E-2
+     bias_mean: 0.1
+     bias_stddev: 0.001
+    y:
+     mean: 0.0
+     stddev: 1.7E-2
+     bias_mean: 0.1
+     bias_stddev: 0.001
+    z:
+     mean: 0.0
+     stddev: 1.7E-2
+     bias_mean: 0.1
+     bias_stddev: 0.001
+  initial_orientation_as_reference: false

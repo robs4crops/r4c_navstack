@@ -1,0 +1,94 @@
+mbase:
+  name: mbase
+  size:
+    x: 0.05
+    y: 0.05
+    z: 0.02
+  mass: 0.100
+  color:
+    r: 1.0
+    g: 0.0
+    b: 0.0
+    a: 1.0
+  parent_frame: base_footprint
+  base_frame: mbase_base_link
+  body_frame: mbase_body_link
+  data_frame: mbase
+  joint_parent_frame_base_frame:
+    name: mbase_base_joint
+    R: 0.0
+    P: 0.0
+    Y: 0.0
+    x: 0.78
+    y: 0.31
+    z: 2.50
+  joint_base_frame_body_frame:
+    name: mbase_body_joint
+    R: 0.0
+    P: 0.0
+    Y: 0.0
+    x: 0.0
+    y: 0.0
+    z: 0.01
+  joint_body_frame_data_frame:
+    name: mbase_joint
+    R: 0.0
+    P: 0.0
+    Y: -1.5707
+    x: 0.0
+    y: 0.0
+    z: 0.0
+
+rover:
+  name: rover
+  size:
+    x: 0.05
+    y: 0.05
+    z: 0.02
+  mass: 0.100
+  color:
+    r: 1.0
+    g: 0.0
+    b: 0.0
+    a: 1.0
+  parent_frame: base_footprint
+  base_frame: rover_base_link
+  body_frame: rover_body_link
+  data_frame: rover
+  joint_parent_frame_base_frame:
+    name: rover_base_joint
+    R: 0.0
+    P: 0.0
+    Y: 0.0
+    x: 0.78
+    y: -0.31
+    z: 2.50
+  joint_base_frame_body_frame:
+    name: rover_body_joint
+    R: 0.0
+    P: 0.0
+    Y: 0.0
+    x: 0.0
+    y: 0.0
+    z: 0.01
+  joint_body_frame_data_frame:
+    name: rover_joint
+    R: 0.0
+    P: 0.0
+    Y: -1.5707
+    x: 0.0
+    y: 0.0
+    z: 0.0
+
+plugins:
+  gps:
+    update_rate: 5.0
+    visualize: false
+    topic: /mbase/fix
+    frame: mbase
+  heading:
+    update_rate: 5.0
+    visualize: false
+    topic: /rover/navheading
+    frame: rover
+    initial_orientation_as_reference: false

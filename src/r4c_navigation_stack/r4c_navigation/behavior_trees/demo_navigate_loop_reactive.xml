@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree drives a robot around two lines in an infinite loop,
+  switching between row following and transitioning navigation actions.
+
+  We assume the robot is properly localized and that the initial/end positions
+  of the lines (L1/L2) are known (see BlackBoard variables below).
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>         
+            <!-- Farm configuration, use LoadControlPoint for loading coordinates in geometry_msgs PoseStamped format.
+                 (conversion from string does not work with nav2 default actions, but with this "loader" node) -->
+            <!-- NOTE: L1_INIT_ANTICIPATED is used in first action, as the tractor will be outside "real" line and would
+                 skip FollowPath action with default bounds. @todo: consider embeddind tolerance margins for the starting
+                 position. -->
+            <LoadControlPoint input="map; -1.0;  0.0; 0.0"     pose="{L1_INIT_ANTICIPATED}"/> 
+            <LoadControlPoint input="map;  4.0;  0.0; 0.0"     pose="{L1_INIT}"/>
+            <LoadControlPoint input="map; 22.0;  0.0; 0.0"     pose="{L1_END}"/>
+            <LoadControlPoint input="map;  4.0; -7.6; 3.14159" pose="{L2_INIT}"/>
+            <LoadControlPoint input="map; 22.0; -7.6; 3.14159" pose="{L2_END}"/>
+            
+            <!-- Maneuver parameters (see bt_conversions.hpp) for syntax -->
+            <!-- From real experiments with the tractor, the approximate maneuver radius is of 3.8m,
+                 with a maximum maneuver distance of 5.0m. Therefore, the exit/entry distances are of 1.2m.
+                 We extend the entry distance a bit further to ensure the tractor enters the row straight. -->
+            <SetBlackboard output_key="MAN_PARAMS" value="map;1;1;False;1.2;4.8;3.8;0.2"/>
+            
+            <SetBlackboard output_key="ROW_WIDTH" value="3.8"/>
+            
+            <KeepRunningUntilFailure>
+                <Sequence>
+                    <!-- Follow row sub-tree. Please bear in mind that as of today
+                         it is NOT YET possible to include Sub-Trees in nav2 XML BT files,
+                         as they yield a "missing key [node]" error.
+                         Associated issue: https://github.com/ros-planning/navigation2/issues/3640
+                         (it seems that BT is not used the best way in nav2...) -->
+                    <CallEmptySrv service_name="eut_crop_row_estimator/start"/>
+                    <PipelineSequence name="NavigateRow">
+                        <RateController hz="2.0">
+                            <GetPathService path="{path}" path_updated="{path_updated}" service="/eut_crop_row_estimator/get_path" request_timeout="5.0"/>
+                        </RateController>
+                        <DoWhileInParcel src_node="{L1_INIT_ANTICIPATED}" dst_node="{L1_END}" row_width="{ROW_WIDTH}" invert_logic="false">
+                            <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+                        </DoWhileInParcel>
+                    </PipelineSequence>
+                    <CallEmptySrv service_name="eut_crop_row_estimator/stop"/>
+
+                    <!-- Transition between rows sub-tree. See comment above -->
+                    <ComputeManeuverPath start="{L1_END}" goal="{L2_END}" maneuver_parameters="{MAN_PARAMS}" path="{path}"/>
+                    <DoWhileInParcel src_node="{L2_END}" dst_node="{L2_INIT}" row_width="{ROW_WIDTH}" invert_logic="true">
+                        <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+                    </DoWhileInParcel>
+
+                    <CallEmptySrv service_name="eut_crop_row_estimator/start"/>
+                    <PipelineSequence name="NavigateRow">
+                        <RateController hz="2.0">
+                            <GetPathService path="{path}" path_updated="{path_updated}" service="/eut_crop_row_estimator/get_path" request_timeout="5.0"/>
+                        </RateController>
+                        <DoWhileInParcel src_node="{L2_END}" dst_node="{L2_INIT}" row_width="{ROW_WIDTH}" invert_logic="false">
+                            <FollowPath path="{path}" controller_id="ReactivePurePursuit"/>
+                        </DoWhileInParcel>
+                    </PipelineSequence>
+                    <CallEmptySrv service_name="eut_crop_row_estimator/stop"/>
+
+                    <ComputeManeuverPath start="{L2_INIT}" goal="{L1_INIT}" maneuver_parameters="{MAN_PARAMS}" path="{path}"/>
+                    <DoWhileInParcel src_node="{L1_INIT}" dst_node="{L1_END}" row_width="{ROW_WIDTH}" invert_logic="true">
+                        <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+                    </DoWhileInParcel>
+
+                </Sequence>
+            </KeepRunningUntilFailure>
+
+        </Sequence>
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

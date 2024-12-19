@@ -1,0 +1,51 @@
+{
+  "type": "FeatureCollection",
+  "name": "refuel_zones_serrater",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "max_vehicle_weight": 10000,
+        "max_vehicle_speed": 0.5,
+        "max_vehicle_width": 5,
+        "max_vehicle_height": null
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              [
+                3.091847276029654,
+                42.16471883964897
+              ],
+              [
+                3.0918359300351312,
+                42.16467174443636
+              ],
+              [
+                3.091943716983195,
+                42.16466165260056
+              ],
+              [
+                3.091950524579829,
+                42.16471127077784
+              ],
+              [
+                3.091847276029654,
+                42.16471883964897
+              ]
+            ]
+          ]
+        ],
+        "type": "MultiPolygon"
+      }
+    }
+  ]
+}

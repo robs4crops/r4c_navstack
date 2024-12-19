@@ -1,0 +1,8 @@
+[Unit]
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/local/bin/vpn_connection.sh
+
+[Install]
+WantedBy=multi-user.target

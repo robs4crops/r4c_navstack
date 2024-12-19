@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree freely drives a robot to START
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+      <Sequence>
+          <!-- Get poses from Action Goal -->
+          <SetNavigationPoses input_goals="{goals}" pose_a="{START}" pose_b="{GOAL}" pose_c="{ROW_ORIGIN}" pose_d="{ROW_END}"/>
+          <!-- Define parcel to freely navigate to -->
+          <DefineParcel enter_pose="{ROW_ORIGIN}" exit_pose="{ROW_END}" enter_dist="5.0" exit_dist="2.0" row_width="3.8" parcel_origin="{PARCEL_ORIGIN}" parcel_end="{PARCEL_END}" parcel_width="{PARCEL_WIDTH}"/>
+          <!-- Get pose to start alignment to row from -->
+          <GetAlignmentPose parcel_origin="{ROW_ORIGIN}" parcel_end="{ROW_END}"  vert_alignment_dist="0.01" lat_alignment_dist="0.01" alignment_orientation="0.0" alignment_pose="{ALIGN_POSE}"/>
+          <!-- Compute Smac from current pose to alignment pose -->
+          <ComputePathToPose goal="{ALIGN_POSE}" path="{smac_path}" planner_id="SmacHybrid"/>
+          <!-- Extend the smac path with alignment phase -->
+          <ExtendAlignedPath input_path="{smac_path}" goal_pose="{PARCEL_ORIGIN}" alignment_extension="10.0" output_path="{path}"/>
+          <!-- Navigate -->
+          <DoWhileInParcel src_node="{PARCEL_ORIGIN}" dst_node="{PARCEL_END}" row_width="{PARCEL_WIDTH}" invert_logic="true">
+              <FollowPath path="{path}" controller_id="VectorPursuit"/>
+          </DoWhileInParcel>
+      </Sequence> 
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

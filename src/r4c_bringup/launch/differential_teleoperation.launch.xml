@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="teleop_config_file" default="$(find-pkg-share r4c_bringup)/config/carob_teleoperation.yaml"/>
+  <arg name="joy_topic"          default="joy"/>
+
+  <!-- ******************************************************************** -->
+  <!-- ROS DRIVER FOR A GENERIC LINUX JOYSTICK -->
+  <!-- ******************************************************************** -->
+
+  <!--
+  This node publishes a Joy message, which contains the current state of each one of the joystick's
+  buttons and axes.
+  -->
+  <node pkg="joy_linux" exec="joy_linux_node" name="joy" output="screen">
+    <param from="$(var teleop_config_file)"/>
+    <remap from="joy" to="$(var joy_topic)"/>
+  </node>
+
+  <!-- ******************************************************************** -->
+  <!-- GAMEPAD TELEOP NODE -->
+  <!-- ******************************************************************** -->
+
+  <arg name="teleop_twist_topic"  default="cmd_vel"/>
+
+  <node pkg="teleop_twist_joy" exec="teleop_node" name="teleop_twist_joy_node" output="screen">
+    <param from="$(var teleop_config_file)"/>
+    <remap from="joy"     to="$(var joy_topic)"/>
+    <remap from="cmd_vel" to="$(var teleop_twist_topic)"/>
+  </node>
+</launch>

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<robot name="r4c_tractor" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find r4c_description)/urdf/tractor_nh_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/agcbox_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/r4c_tractor_sensors_platform_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/lidar_2d_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/lidar_3d_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/imu_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/depthai_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/ublox_macro.xacro"/>
+
+  <xacro:tractor_nh config_file="$(find r4c_description)/config/tractor_nh_t4_110f.yaml"/>
+  <xacro:agcbox config_file="$(find r4c_description)/config/agcbox_lsp_es.yaml"/>
+  <xacro:lidar_2d config_file="$(find r4c_description)/config/hokuyo_lidar_lsp_es.yaml"/>
+  <xacro:lidar_3d config_file="$(find r4c_description)/config/rs_helios_lidar_lsp_es.yaml"/>
+  <xacro:lidar_3d config_file="$(find r4c_description)/config/livox_mid360_lidar_lsp_es.yaml"/>
+  <xacro:i_m_u config_file="$(find r4c_description)/config/um7.yaml"/>
+  <xacro:ublox config_file="$(find r4c_description)/config/ublox.yaml"/>
+  <!-- <xacro:depthai_camera config_file="$(find r4c_description)/config/luxonis_oak_d_poe_camera_lsp_es.yaml"/> -->
+
+</robot>

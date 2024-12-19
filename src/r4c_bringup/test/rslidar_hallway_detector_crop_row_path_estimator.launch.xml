@@ -1,0 +1,71 @@
+<launch>
+
+  <set_parameter name="use_sim_time"  value="false"/>
+  <arg name="rslidar_topic"         default="/rslidar_points"/>
+
+  <!-- ************************************************************************ -->
+  <!-- HALLWAY DETECTOR -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_hallway_detector"                default="true"/>
+  <arg name="hallway_detector_name"               default="hallway_detector"/>
+  <arg name="hallway_detector_src_config_file"    default="$(find-pkg-share r4c_bringup)/config/rs_hallway_detector.yaml"/>
+  
+  <let name="hallway_detector_config_file"        value="$(find-pkg-share r4c_bringup)/config/$(var hallway_detector_name).yaml"/>
+  <let name="hallway_detector_input_cloud_topic"  value="/rslidar_points/filtered"/>
+  <let name="hallway_detector_line_markers_topic" value="/$(var hallway_detector_name)/line_markers"/>
+
+  <!-- Copy the proper configuration file into $(var hallway_detector_config_file) and put the proper node name. -->
+  <executable cmd="$(find-pkg-share r4c_bringup)/scripts/set_config_file $(var hallway_detector_src_config_file) $(var hallway_detector_config_file) $(var hallway_detector_name)" output="screen"/>
+
+  <!-- Filter rs lidar -->
+  <node pkg="eut_pcl_utils" exec="rslidar_horizontal_angle_range_filter_node" name="rslidar_filter" output="screen">
+    <param name="min_angle" value="-3.14"/>
+    <param name="max_angle" value="3.14"/>
+    <param name="min_range" value="0.5"/>
+    <param name="max_range" value="200.0"/>
+    <remap from="/rslidar_points"          to="$(var rslidar_topic)"/>
+    <remap from="/rslidar_points/filtered" to="$(var hallway_detector_input_cloud_topic)"/>
+  </node>
+
+  <!-- Launch hallway detector -->
+  <include file="$(find-pkg-share eut_hallway_detector)/launch/hallway_detector.launch.xml">
+    <arg name="node_name"          value="$(var hallway_detector_name)"/>
+    <arg name="config_file"        value="$(var hallway_detector_config_file)"/>
+    <arg name="input_cloud_topic"  value="$(var hallway_detector_input_cloud_topic)"/>
+    <arg name="line_markers_topic" value="$(var hallway_detector_line_markers_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- CROP ROW PATH ESTIMATOR -->
+  <!-- ************************************************************************ -->
+
+  <arg name="crop_row_estimator_name"              default="simple_crop_row_estimator"/>
+  <arg name="crop_row_estimator_src_config_file"   default="$(find-pkg-share r4c_bringup)/config/rs_crop_row_estimator.yaml"/>
+  <arg name="crop_row_estimator_global_plan_topic" default="/central_line"/>
+
+  <let name="crop_row_estimator_config_file"       value="$(find-pkg-share r4c_bringup)/config/$(var crop_row_estimator_name).yaml"/>
+
+  <!-- Copy the proper configuration file into $(var hallway_detector_config_file) and put the proper node name. -->
+  <executable cmd="$(find-pkg-share r4c_bringup)/scripts/set_config_file $(var crop_row_estimator_src_config_file) $(var crop_row_estimator_config_file) $(var crop_row_estimator_name)" output="screen"/>
+
+  <!-- Launch crop row estimator -->
+  <include file="$(find-pkg-share eut_crop_row_estimator)/launch/crop_row_estimator.launch.xml">
+    <arg name="node_name"          value="$(var crop_row_estimator_name)"/>
+    <arg name="config_file"        value="$(var crop_row_estimator_config_file)"/>
+    <arg name="lines_topic"        value="$(var hallway_detector_line_markers_topic)"/>
+    <arg name="global_plan_topic"  value="$(var crop_row_estimator_global_plan_topic)"/>
+  </include>
+
+  <!-- ************************************************************************ -->
+  <!-- RVIZ -->
+  <!-- ************************************************************************ -->
+
+  <arg name="use_rviz"         default="true"/>
+  <arg name="rviz_config_file" default="$(find-pkg-share r4c_bringup)/rviz/rslidar_hallway_detector_crop_row_path_estimator.rviz"/>
+
+  <include file="$(find-pkg-share r4c_bringup)/launch/rviz.launch.xml" if="$(var use_rviz)">
+    <arg name="config_file" value="$(var rviz_config_file)"/>
+  </include>
+
+</launch>

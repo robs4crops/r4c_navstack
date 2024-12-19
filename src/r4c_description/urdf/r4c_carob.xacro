@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<robot name="r4c_carob" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find r4c_description)/urdf/carob_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/agcbox_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/lidar_3d_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/imu_macro.xacro"/>
+  <xacro:include filename="$(find r4c_description)/urdf/depthai_macro.xacro"/>
+
+  <xacro:carob config_file="$(find r4c_description)/config/carob.yaml"/>
+  <xacro:agcbox config_file="$(find r4c_description)/config/agcbox_lsp_gr.yaml"/>
+  <xacro:lidar_3d config_file="$(find r4c_description)/config/rs_helios_lidar_lsp_gr.yaml"/>
+  <xacro:lidar_3d config_file="$(find r4c_description)/config/livox_mid360_lidar_lsp_gr_carob.yaml"/>
+  <xacro:i_m_u config_file="$(find r4c_description)/config/um7.yaml"/>
+  <xacro:depthai_camera config_file="$(find r4c_description)/config/luxonis_oak_d_poe_camera_lsp_gr.yaml"/>
+
+</robot>

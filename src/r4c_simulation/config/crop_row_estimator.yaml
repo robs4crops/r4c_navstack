@@ -1,0 +1,21 @@
+simple_crop_row_estimator:
+  ros__parameters:
+    target_frame: "base_link"
+    time_tolerance: 5.0
+    alpha: 0.6
+    path_length: 20.0
+    interpolate_path: False
+    interpolation_distance: 0.5
+    lines_max: 10
+    threshold: 2
+    rho_min: -3.0
+    rho_max: 3.0
+    rho_step: 0.1
+    theta_min: 60.0
+    theta_max: 120.0
+    theta_step: 0.5
+    row_width: 2.5
+    row_width_tolerance: 0.5
+    theta_tolerance: 5
+    min_num_points_ls: 5
+    crop_lines_method: 0

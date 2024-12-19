@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<!--
+  This Behavior Tree drives a robot around two lines in an infinite loop,
+  switching between row following and transitioning navigation actions.
+
+  We assume the robot is properly localized and that the initial/end positions
+  of the lines (L1/L2) are known (see BlackBoard variables below).
+-->
+
+<root main_tree_to_execute="BehaviorTree">
+
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>         
+            <!-- Farm configuration, use LoadControlPoint for loading coordinates in geometry_msgs PoseStamped format.
+                 (conversion from string does not work with nav2 default actions, but with this "loader" node) -->
+            <LoadControlPoint input="map;  4.0;  0.0; 0.0"     pose="{L1_INIT}"/>
+            <LoadControlPoint input="map; 22.0;  0.0; 0.0"     pose="{L1_END}"/>
+            <LoadControlPoint input="map;  4.0; -7.6; 3.14159" pose="{L2_INIT}"/>
+            <LoadControlPoint input="map; 22.0; -7.6; 3.14159" pose="{L2_END}"/>
+            
+            <!-- Maneuver parameters (see bt_conversions.hpp) for syntax -->
+            <!-- From real experiments with the tractor, the approximate maneuver radius is of 3.8m,
+                 with a maximum maneuver distance of 5.0m. Therefore, the exit/entry distances are of 1.2m.
+                 We extend the entry distance a bit further to ensure the tractor enters the row straight. -->
+            <SetBlackboard output_key="MAN_PARAMS" value="map;1;1;False;1.2;2.4;3.8;0.2"/>
+            
+            <KeepRunningUntilFailure>
+                <Sequence>
+                    <ChangeWaypoints service_name="/planner_server/change_waypoints_file" waypoints_file="waypoints_simulation_l1"/>
+                    <ComputePathToPose goal="{L1_END}" path="{path}" planner_id="WaypointBased"/>
+                    <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+
+                    <ComputeManeuverPath start="{L1_END}" goal="{L2_END}" maneuver_parameters="{MAN_PARAMS}" path="{path}"/>
+                    <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+
+                    <ChangeWaypoints service_name="/planner_server/change_waypoints_file" waypoints_file="waypoints_simulation_l2"/>
+                    <ComputePathToPose goal="{L2_INIT}" path="{path}" planner_id="WaypointBased"/>
+                    <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+
+                    <ComputeManeuverPath start="{L2_INIT}" goal="{L1_INIT}" maneuver_parameters="{MAN_PARAMS}" path="{path}"/>
+                    <FollowPath path="{path}" controller_id="GlobalPurePursuit"/>
+                </Sequence>
+            </KeepRunningUntilFailure>
+
+        </Sequence>
+    </BehaviorTree>
+
+    <TreeNodesModel>
+    </TreeNodesModel>
+
+</root>

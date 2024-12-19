@@ -1,0 +1,63 @@
+ekf_filter_node_global:
+  ros__parameters:
+
+    odom_frame: odom
+    base_link_frame: base_footprint
+    map_frame: map
+    world_frame: map
+
+    frequency: 50.0
+    publish_tf: true
+    two_d_mode: true
+
+    # x, y, z,
+    # roll, pitch, yaw,
+    # vx, vy, vz,
+    # vroll, vpitch, vyaw,
+    # ax, ay, az
+
+    # Wheel odometry
+    odom0: /r4c_tractor/wheel_odom #Coming from tractor wheel odom
+    odom0_queue_size: 10
+    odom0_differential: false
+    odom0_config: [false, false, false,
+                   false, false, false,
+                   false,  false,  false,
+                   false, false, false,
+                   false, false, false]                
+
+    odom1: /odometry/gps  #Coming from navsat_transform_node
+    odom1_differential: false
+    odom1_queue_size: 10
+    odom1_config: [true,  true,  false,
+                   false, false, false,
+                   false, false, false,
+                   false, false, false,
+                   false, false, false]
+
+
+    imu0: /r4c_tractor/agcbox/heading_imu
+    imu0_queue_size: 10
+    imu0_config: [false, false,  false,
+                  false, false,  true,
+                  false, false,  false,
+                  false, false,  false,
+                  false, false,  false]
+    imu0_remove_gravitational_acceleration: false
+
+    ## Original values: x - 0.05, y - 0.05, yaw - 0.06
+    # process_noise_covariance: [0.01,  0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.01,   0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.06,   0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.03,   0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.03,   0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.06,   0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.025,   0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.025,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.04,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.01,   0.0,    0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.01,   0.0,    0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.02,   0.0,    0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.01,   0.0,    0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.01,   0.0,
+    #                            0.0,   0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.015]

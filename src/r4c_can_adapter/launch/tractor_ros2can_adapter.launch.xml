@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="can_adapters_params_file" description="this argument must be provided externally"/>
+
+  <node pkg="r4c_can_adapter" exec="tractor_ros2can_adapter_node" name="tractor_ros2can_adapter" output="screen">
+    <param from="$(var can_adapters_params_file)"/>
+  </node>
+</launch>

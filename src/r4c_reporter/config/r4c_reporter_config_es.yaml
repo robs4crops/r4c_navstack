@@ -1,0 +1,104 @@
+tractor_reporter:
+  ros__parameters:
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    sensors_status_topic: "/r4c_tractor/sensors/status"
+    communication_status_topic: "/r4c_tractor/comms/status"
+    localization_status_topic: "/r4c_tractor/localization/status"
+    status_topic: "/lsps/tractor_status"
+
+sensors_reporter:
+  ros__parameters:
+    check_frequency: 1.0
+    status_topic: "/r4c_tractor/sensors/status"
+    oakd_status_topic: "/r4c_tractor/sensors/oakd/status"
+    um7_status_topic: "/r4c_tractor/sensors/um7/status"
+    ublox_status_topic: "/r4c_tractor/sensors/ublox/status"
+    livox_status_topic: "/r4c_tractor/sensors/livox/status"
+    rslidar_status_topic: "/r4c_tractor/sensors/rslidar/status"
+
+oakd_reporter:
+  ros__parameters:
+    report: false
+    sensor_name: "oakd"
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 11.0
+    occlusion_thresh: 0.1
+    sensor_topic: "/stereo/depth"
+    status_topic: "/r4c_tractor/sensors/oakd/status"
+
+um7_reporter:
+  ros__parameters:
+    report: true
+    sensor_name: "imu"
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    sensor_topic: "/imu"
+    status_topic: "/r4c_tractor/sensors/um7/status"
+
+rslidar_reporter:
+  ros__parameters:
+    report: true
+    sensor_name: "rslidar"
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    sensor_topic: "/rslidar_points"
+    status_topic: "/r4c_tractor/sensors/rslidar/status"
+
+livox_reporter:
+  ros__parameters:
+    report: false
+    sensor_name: "livox"
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    sensor_topic: "/livox/points"
+    status_topic: "/r4c_tractor/sensors/livox/status"
+
+ublox_reporter:
+  ros__parameters:
+    report: false
+    sensor_name: "ublox"
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    sensor_topic: "/mbase/fix"
+    rtcm_topic: "/rtcm"
+    status_topic: "/r4c_tractor/sensors/ublox/status"
+
+communication_reporter:
+  ros__parameters:
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    internet_status_topic: "/r4c_tractor/comms/internet/status"
+    can_status_topic: "/r4c_tractor/comms/can/status"
+    status_topic: "/r4c_tractor/comms/status"
+
+internet_reporter:
+  ros__parameters:
+    timeout: 5.0
+    check_frequency: 3.0
+    status_topic: "/r4c_tractor/comms/internet/status"
+
+can_reporter:
+  ros__parameters:
+    sync_threshold: 100.0
+    timeout: 5.0
+    check_frequency: 1.0
+    can_topic: "/can_msg_from_can_bus"
+    status_topic: "/r4c_tractor/comms/can/status"
+
+localization_reporter:
+  ros__parameters:
+    covariance_threshold: 1.0
+    timeout: 5.0
+    check_frequency: 1.0
+    odom_topic: "/r4c_tractor/odom_global"
+    gnss_topic: "/r4c_tractor/agcbox/gnss/wgs84_fix"
+    heading_topic: "/r4c_tractor/agcbox/heading_imu"
+    status_topic: "/r4c_tractor/localization/status"

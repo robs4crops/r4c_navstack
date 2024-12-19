@@ -1,0 +1,40 @@
+tractor_can2ros_adapter:
+  ros__parameters:
+    dbc_file:                             /home/eutrob/workspace/src/robs4crops/src/r4c_interfaces/dbc/agc_eut_tractor_20240806.dbc
+    agcbox_base_frame:                    agcbox_base_link
+    agcbox_gnss_frame:                    agcbox_gnss_link
+    agcbox_imu_frame:                     agcbox_imu_link
+    wgnss84_position_coordinate_variance: 0.0001
+    heading_imu_yaw_variance:             0.0001
+    heading_default_value:                1.57079632679489661923
+    steering_bias_deg:                    0.0
+    slope_gbsd:                           1.167098883752396
+    intercept_gbsd:                       0.22153004848348257
+    agcbox_ens_control_topic:             r4c_tractor/agcbox/ens/control
+    agcbox_ens_heartbeat_topic:           r4c_tractor/agcbox/ens/heartbeat
+    agcbox_gnss_cog_sog_topic:            r4c_tractor/agcbox/gnss/cog_sog
+    agcbox_gnss_enu_pos_topic:            r4c_tractor/agcbox/gnss/enu/pos
+    agcbox_gnss_enu_vel_topic:            r4c_tractor/agcbox/gnss/enu/vel
+    agcbox_gnss_metadata_topic:           r4c_tractor/agcbox/gnss/metadata
+    agcbox_gnss_wgs84_fix_topic:          r4c_tractor/agcbox/gnss/wgs84_fix
+    agcbox_heading_topic:                 r4c_tractor/agcbox/heading_imu
+    agcbox_imu_topic:                     r4c_tractor/agcbox/imu
+    manual_mode_topic:                    r4c_tractor/manual_mode
+    front_left_wheel_angle_topic:         r4c_tractor/front_left_wheel_angle
+    gbsd_topic:                           r4c_tractor/gbsd
+    input_can_msg_topic:                  can_msg_from_can_bus
+    mw_soft_stop_topic:                   r4c_tractor/mw/soft_stop
+    mw_twist_recommendation_topic:        r4c_tractor/mw/vel_recommendation
+    rear_left_wheel_linear_vel_topic:     r4c_tractor/rear_left_wheel_linear_vel
+    rear_right_wheel_linear_vel_topic:    r4c_tractor/rear_right_wheel_linear_vel
+    twist_topic:                          r4c_tractor/vel
+    twist_cmd_echo_topic:                 r4c_tractor/cmd_vel_echo
+
+tractor_ros2can_adapter:
+  ros__parameters:
+    dbc_file:                             /home/eutrob/workspace/src/robs4crops/src/r4c_interfaces/dbc/agc_eut_tractor_20240806.dbc
+    ens_status_topic:                     r4c_tractor/agcbox/ens/status
+    gbsd_topic:                           r4c_tractor/gbsd
+    gnss_wgs84_fix_topic:                 r4c_tractor/nobu/gnss/wgs84_fix
+    ouput_can_msg_topic:                  can_msg_to_can_bus
+    twist_cmd_topic:                      r4c_tractor/cmd_vel

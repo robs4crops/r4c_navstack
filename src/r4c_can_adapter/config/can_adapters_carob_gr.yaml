@@ -1,0 +1,56 @@
+carob_can2ros_adapter:
+  ros__parameters:
+    dbc_file:                             /home/eutrob/workspace/src/robs4crops/src/r4c_interfaces/dbc/agc_eut_ceol_20231130_v0.1.0.dbc
+    agcbox_base_frame:                    agcbox_base_link
+    agcbox_gnss_frame:                    agcbox_gnss_link
+    agcbox_imu_frame:                     agcbox_imu_link
+    inverter_max_torque:                  25.0
+    reduction_ratio_carob:                20.3
+    reduction_ratio_ceol:                 42.7
+    sprocket_radius_carob:                0.12605
+    sprocket_radius_ceol:                 0.149
+    wheel_radius:                         0.391
+    wheel_spacing:                        1.01722
+    wgnss84_position_coordinate_variance: 0.0001
+    heading_imu_yaw_variance:             0.0001
+    heading_default_value:                1.57079632679489661923
+    agcbox_ens_control_topic:             r4c_tractor/agcbox/ens/control
+    agcbox_ens_heartbeat_topic:           r4c_tractor/agcbox/ens/heartbeat
+    agcbox_gnss_cog_sog_topic:            r4c_tractor/agcbox/gnss/cog_sog
+    agcbox_gnss_enu_pos_topic:            r4c_tractor/agcbox/gnss/enu/pos
+    agcbox_gnss_enu_vel_topic:            r4c_tractor/agcbox/gnss/enu/vel
+    agcbox_gnss_metadata_topic:           r4c_tractor/agcbox/gnss/metadata
+    agcbox_gnss_wgs84_fix_topic:          r4c_tractor/agcbox/gnss/wgs84_fix
+    agcbox_heading_topic:                 r4c_tractor/agcbox/heading_imu
+    agcbox_imu_topic:                     r4c_tractor/agcbox/imu
+    gbsd_topic:                           r4c_tractor/gbsd
+    input_can_msg_topic:                  can_msg_from_can_bus
+    left_track_inverter_topic:            r4c_tractor/left_track/inverter
+    right_track_inverter_topic:           r4c_tractor/right_track/inverter
+    left_track_linear_vel_topic:          r4c_tractor/left_track/linear_vel
+    right_track_linear_vel_topic:         r4c_tractor/right_track/linear_vel
+    mw_soft_stop_topic:                   r4c_tractor/mw/soft_stop
+    mw_twist_recommendation_topic:        r4c_tractor/mw/vel_recommendation
+    twist_topic:                          r4c_tractor/vel
+
+agcbox_ens_emulator:
+  ros__parameters:
+    ens_control_topic:                    r4c_tractor/agcbox/ens/control
+    ens_status_topic:                     r4c_tractor/agcbox/ens/status
+    manual_mode_topic:                    r4c_tractor/manual_mode
+    manual_mode_publishing_rate:          30.0
+
+carob_ros2can_adapter:
+  ros__parameters:
+    dbc_file:                             /home/eutrob/workspace/src/robs4crops/src/r4c_interfaces/dbc/agc_eut_ceol_20231130_v0.1.0.dbc
+    reduction_ratio_carob:                20.3
+    reduction_ratio_ceol:                 42.7
+    sprocket_radius_carob:                0.12605
+    sprocket_radius_ceol:                 0.149
+    wheel_spacing:                        1.01722
+    ens_status_topic:                     r4c_tractor/agcbox/ens/status
+    gbsd_topic:                           r4c_tractor/gbsd
+    gnss_wgs84_fix_topic:                 r4c_tractor/nobu/gnss/wgs84_fix
+    ouput_can_msg_topic:                  can_msg_to_can_bus
+    twist_cmd_topic:                      r4c_tractor/cmd_vel
+

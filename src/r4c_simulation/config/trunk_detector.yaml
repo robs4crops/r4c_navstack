@@ -1,0 +1,27 @@
+laser2d_trunk_detector:
+  ros__parameters:
+    target_frame: "base_link"
+    output_frame: "base_link"
+    x_min_pcl_target_frame: -20.0
+    x_max_pcl_target_frame: 20.0
+    y_min_pcl_target_frame: -2.20
+    y_max_pcl_target_frame: 2.20
+    z_min_pcl_target_frame: -0.25
+    z_max_pcl_target_frame: 0.10
+    x_min_pcl_ground_frame: -20.0
+    x_max_pcl_ground_frame: 20.0
+    y_min_pcl_ground_frame: -2.20
+    y_max_pcl_ground_frame: 2.20
+    z_min_pcl_ground_frame: -0.05
+    z_max_pcl_ground_frame: 0.30
+    trunk_voxel_size: 0.01
+    cluster_min_size: 3
+    cluster_max_size: 100
+    cluster_tolerance: 0.1
+    min_trunk_layers: 3
+    max_skipped_layers: 1
+    trunk_xy_tolerance: 0.1
+    centroid_min_width: 0.01
+    centroid_max_width: 0.30
+    ror_min_neighbors: 2
+    ror_radius_search: 0.03

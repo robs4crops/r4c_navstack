@@ -1,0 +1,23 @@
+livox_crop_row_estimator:
+  ros__parameters:
+    target_frame: "base_link"
+    path_length: 60.0
+    interpolate_path: True
+    interpolation_distance: 0.5
+    # Hough Transform
+    lines_max: 10
+    threshold: 2
+    rho_min: -3.0
+    rho_max: 3.0
+    rho_step: 0.1
+    theta_min: 60.0
+    theta_max: 120.0
+    theta_step: 0.5
+    # Crop row
+    row_width: 3.0
+    row_width_tolerance: 0.5
+    theta_tolerance: 10
+    # Least Squares
+    min_num_points_ls: 5
+    # Fitting method
+    crop_lines_method: 0
